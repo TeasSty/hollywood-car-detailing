@@ -366,9 +366,9 @@ const jsonLd = {
           </div>
           <div class="case-register" role="list" aria-label="Автомобили из работ студии">
             {
-              cases.map((car, index) => (
+              cases.map((car) => (
                 <div class="case-register__item" role="listitem">
-                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <span aria-hidden="true">+</span>
                   <strong>{car}</strong>
                   <small>зафиксирован в журнале работ</small>
                 </div>
