@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://teassty.github.io/hollywood-car-detailing/sitemap.xml

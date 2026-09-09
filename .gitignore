@@ -1,0 +1,18 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+.astro/
+
+# local tooling
+.netlify/
+.DS_Store
+Thumbs.db
+*.log
+qa-*.png
+
+# environment files
+.env
+.env.*
+!.env.example
