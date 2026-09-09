@@ -1,26 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#0B0D10"/>
-  <g fill="none" stroke="#9298A1" stroke-width="1" opacity=".25">
-    <path d="M60 70H1140M60 190H1140M60 510H1140M160 40V570M600 40V590M1040 40V570" stroke-dasharray="3 14"/>
-  </g>
-  <text x="60" y="76" fill="#D7FF43" font-family="Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="4">'/   · / !,</text>
-  <text x="60" y="160" fill="#F1EFE9" font-family="Arial Black, Arial, sans-serif" font-size="58" font-weight="900" letter-spacing="-2">HOLLYWOOD</text>
-  <text x="63" y="207" fill="#9298A1" font-family="Arial, sans-serif" font-size="29" font-weight="700" letter-spacing="9">CAR DETAILING</text>
-  <g fill="none" stroke="#F1EFE9" stroke-linejoin="bevel" stroke-width="4">
-    <path d="M107 453h73l70-110 178-72h293l198 78 107 112h81"/>
-    <path d="M280 342l21 111M428 271l46 183M721 271l-32 183M919 349l-28 107"/>
-    <path d="M183 453c15-84 137-91 168 0M782 453c18-90 149-90 173 0"/>
-    <circle cx="268" cy="458" r="68"/>
-    <circle cx="268" cy="458" r="24"/>
-    <circle cx="869" cy="458" r="68"/>
-    <circle cx="869" cy="458" r="24"/>
-  </g>
-  <g fill="#D7FF43" stroke="#D7FF43">
-    <circle cx="442" cy="274" r="8"/>
-    <path d="M442 274 382 230H285" fill="none" stroke-width="2"/>
-    <circle cx="917" cy="350" r="8"/>
-    <path d="M917 350 988 294h117" fill="none" stroke-width="2"/>
-  </g>
-  <text x="949" y="152" fill="#F1EFE9" font-family="Arial Black, Arial, sans-serif" font-size="96" font-weight="900" letter-spacing="-8">123</text>
-  <text x="61" y="588" fill="#9298A1" font-family="Arial, sans-serif" font-size="17" font-weight="700" letter-spacing="3">", ! "  ", %'"!/  !!" ",</text>
-</svg>

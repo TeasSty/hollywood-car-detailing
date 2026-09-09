@@ -11,6 +11,7 @@ dist/
 Thumbs.db
 *.log
 qa-*.png
+.qa/
 
 # environment files
 .env

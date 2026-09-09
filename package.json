@@ -1,6 +1,6 @@
 {
   "name": "hollywood-car-detailing",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Промосайт детейлинг-центра HOLLYWOOD CAR DETAILING в Ярославле",
   "scripts": {
     "dev": "astro dev",
@@ -20,7 +20,8 @@
   "type": "module",
   "dependencies": {
     "@fontsource-variable/manrope": "^5.3.0",
-    "@fontsource-variable/unbounded": "^5.3.0",
+    "@fontsource-variable/oswald": "^5.3.0",
+    "@fontsource/yellowtail": "^5.3.0",
     "astro": "^7.3.2"
   },
   "devDependencies": {

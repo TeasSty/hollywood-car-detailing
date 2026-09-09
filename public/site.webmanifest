@@ -1,11 +1,13 @@
 {
   "name": "HOLLYWOOD CAR DETAILING",
-  "short_name": "HCD 123",
-  "description": "Детейлинг-центр в Ярославле",
+  "short_name": "HOLLYWOOD",
+  "description": "Детейлинг-центр в Ярославле: оклейка, полировка, химчистка, свет, звук, шумоизоляция, антикор и кастом.",
+  "lang": "ru",
   "start_url": "/hollywood-car-detailing/",
+  "scope": "/hollywood-car-detailing/",
   "display": "standalone",
-  "background_color": "#0B0D10",
-  "theme_color": "#0B0D10",
+  "background_color": "#0A0A0C",
+  "theme_color": "#0A0A0C",
   "icons": [
     {
       "src": "favicon.svg",
