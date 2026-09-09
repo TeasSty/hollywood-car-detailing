@@ -11,85 +11,105 @@ import "../styles/site.css";
 
 const siteUrl = "https://teassty.github.io/hollywood-car-detailing/";
 const vkUrl = "https://vk.com/hollywoodcardetailing";
-const mapsUrl = "https://yandex.ru/maps/org/239649973526";
+const mapsUrl = "https://yandex.ru/maps/org/hollywood_car_detailing/239649973526/";
 const phoneDisplay = "+7 (951) 284-23-25";
 const phoneHref = "tel:+79512842325";
 const waBase = "https://wa.me/79512842325";
-const hours = "Пн–Сб, 10:00–20:00";
-const address = "Ярославль, Ленинградский пр-т, 123Д";
+const tgUrl = "https://t.me/+79512842325";
+const hours = "Пн–Сб · 10:00–20:00";
+const address = "Ярославль, Ленинградский проспект, 123Д";
 const streetAddress = "Ленинградский проспект, 123Д";
+const defaultWa = "Здравствуйте! Хочу записаться в HOLLYWOOD CAR DETAILING.";
 
-const services = [
+const departments = [
   {
-    title: "Детейлинг и полировка",
-    text: "Кузов доводят до чистого блеска: мойка, полировка, защита.",
+    id: "skin",
+    title: "Skin",
+    ru: "Кузов",
+    text: "Оклейка бронеплёнкой и винилом, антихром, полировка, керамика, жидкое стекло, антидождь.",
   },
   {
-    title: "Оклейка",
-    text: "Бронеплёнка и винил — прозрачные и цветные решения под задачу.",
+    id: "light",
+    title: "Light",
+    ru: "Свет",
+    text: "Bi-LED линзы, ремонт и полировка фар, бронирование оптики.",
   },
   {
-    title: "Химчистка салона",
-    text: "Интерьер возвращают в рабочее состояние без «маскировки запахом».",
+    id: "sound",
+    title: "Sound",
+    ru: "Звук",
+    text: "Аудиосистемы от штатной замены до соревновательного уровня, магнитолы, шумоизоляция.",
   },
   {
-    title: "Свет",
-    text: "Установка Bi-LED и работа с оптикой для ночной видимости.",
+    id: "interior",
+    title: "Interior",
+    ru: "Салон",
+    text: "Химчистка, перетяжка потолка и деталей, контурная подсветка, звездное небо.",
   },
   {
-    title: "Звук и шумка",
-    text: "Аудиосистемы и шумоизоляция — в одном боксе со студией.",
+    id: "care",
+    title: "Care",
+    ru: "Уход",
+    text: "Детейлинг-мойка, детейлинг-уборка, антикор, предпродажная подготовка.",
   },
   {
-    title: "Антикор и кастом",
-    text: "Защита днища и нестандартные доработки под конкретный автомобиль.",
+    id: "custom",
+    title: "Custom",
+    ru: "Кастом",
+    text: "Обвесы, доводчики, электротонировка, сигнализации и нестандартные установки.",
   },
 ];
 
-const works = [
+const takes = [
   {
     image: audiThree,
     alt: "Audi A5 после работ в студии HOLLYWOOD CAR DETAILING",
-    caption: "Audi A5 · кузов",
-  },
-  {
-    image: audiHood,
-    alt: "Капот Audi A5 крупным планом после детейлинга",
-    caption: "Капот · блик",
+    label: "Кузов",
   },
   {
     image: salonRetrim,
     alt: "Перетяжка салона автомобиля в студии",
-    caption: "Салон · перетяжка",
+    label: "Салон",
   },
   {
-    image: audiRear,
-    alt: "Задняя четверть Audi A5",
-    caption: "Четверть · линия",
+    image: audiHood,
+    alt: "Капот Audi A5 крупным планом после детейлинга",
+    label: "Блик",
   },
   {
     image: audiFront,
     alt: "Audi A5 в боксе студии",
-    caption: "Бокс · приёмка",
+    label: "Бокс",
+  },
+  {
+    image: audiRear,
+    alt: "Задняя четверть Audi A5",
+    label: "Линия",
   },
   {
     image: audiRings,
     alt: "Деталь эмблемы Audi крупным планом",
-    caption: "Деталь · хром",
+    label: "Деталь",
   },
 ];
 
-const zones = ["Кузов", "Салон", "Оптика", "Днище", "Аудио / шумка"];
-const tasks = [
-  "Детейлинг",
-  "Оклейка",
-  "Полировка",
-  "Химчистка",
-  "Свет",
-  "Звук",
-  "Шумоизоляция",
-  "Антикор",
-  "Кастом",
+const steps = [
+  {
+    title: "Заявка",
+    text: "Пишете в WhatsApp или Telegram: авто, задача, удобный день.",
+  },
+  {
+    title: "Осмотр",
+    text: "В боксе смотрим объём и согласуем состав работ до старта.",
+  },
+  {
+    title: "Продакшн",
+    text: "Кузов, салон, свет, звук и защита — в одном месте.",
+  },
+  {
+    title: "Премьера",
+    text: "Сдача с гарантийным заказ-нарядом на работы и материалы.",
+  },
 ];
 
 const reviews = [
@@ -98,41 +118,36 @@ const reviews = [
     text: "Приятные ребята, свою работу выполняют качественно и профессионально. Есть зона ожидания, чай, кофе. Очень интересный интерьер, не как у всех.",
   },
   {
-    name: "Max",
-    text: "Хорошее место, отзывчивые люди. Задержались после рабочего дня и помогли привести машину в порядок — лобовое стекло, чтобы можно было ехать ночью.",
+    name: "Виктор Зеленцов",
+    text: "Установили контурную подсветку, оклейку передней части бронеплёнкой, доводчики дверей, замену стёкол фар. Подход серьёзный — каждый проводок изолирован, уложен по заводу.",
   },
   {
-    name: "Роман Тиотов",
-    text: "Очень хороший коллектив. Доброжелательный, оперативно сделали полную химчистку. Советую.",
+    name: "Александр Самущенко",
+    text: "Переделали работу за предыдущим «мастером», грамотно настроили автозвук. Позже ставил Bi-LED линзы с бронированием — аккуратно, по срокам пошли навстречу.",
   },
 ];
 
-const process = [
-  {
-    title: "Заявка",
-    text: "Пишете в WhatsApp: автомобиль, задача, удобный день.",
-  },
-  {
-    title: "Осмотр",
-    text: "В боксе смотрим объём работ и согласуем состав до старта.",
-  },
-  {
-    title: "Работа",
-    text: "Кузов, салон, свет, звук и защита — в одном месте.",
-  },
-  {
-    title: "Сдача",
-    text: "Заказ-наряд и гарантия на работы и материалы по итогам.",
-  },
+const buildOptions = [
+  "Оклейка / плёнка",
+  "Полировка",
+  "Химчистка",
+  "Bi-LED / свет",
+  "Автозвук",
+  "Шумоизоляция",
+  "Перетяжка салона",
+  "Антихром",
+  "Антикор",
+  "Кастом",
 ];
 
-const defaultWa = "Здравствуйте! Хочу обсудить работы по автомобилю.";
 const ogPath = `${siteUrl}og-cover.jpg`;
-
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "AutoDetailing",
+  "@type": "AutoRepair",
   name: "HOLLYWOOD CAR DETAILING",
+  alternateName: "Hollywood car detailing",
+  description:
+    "Детейлинг и тюнинг-студия в Ярославле: оклейка, полировка, химчистка, Bi-LED, автозвук, шумоизоляция, кастом.",
   url: siteUrl,
   image: ogPath,
   telephone: "+79512842325",
@@ -140,7 +155,13 @@ const jsonLd = {
     "@type": "PostalAddress",
     streetAddress,
     addressLocality: "Ярославль",
+    addressRegion: "Ярославская область",
     addressCountry: "RU",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: 57.6993,
+    longitude: 39.7584,
   },
   openingHoursSpecification: [
     {
@@ -150,7 +171,14 @@ const jsonLd = {
       closes: "20:00",
     },
   ],
-  sameAs: [vkUrl, mapsUrl],
+  priceRange: "₽₽",
+  sameAs: [vkUrl, mapsUrl, tgUrl],
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "5.0",
+    reviewCount: "60",
+    bestRating: "5",
+  },
 };
 ---
 
@@ -159,32 +187,35 @@ const jsonLd = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>HOLLYWOOD CAR DETAILING — детейлинг в Ярославле</title>
+    <title>HOLLYWOOD CAR DETAILING — студия полного образа авто в Ярославле</title>
     <meta
       name="description"
-      content="Детейлинг-центр в Ярославле: оклейка, полировка, химчистка, свет, звук, шумоизоляция, антикор и кастом. Ленинградский пр-т, 123Д."
+      content="Детейлинг, оклейка, Bi-LED, автозвук, шумоизоляция и кастом в Ярославле. Ленинградский пр-т, 123Д. Запись в WhatsApp."
     />
     <link rel="canonical" href={siteUrl} />
     <meta name="robots" content="index,follow" />
-    <meta name="theme-color" content="#F3EEE6" />
+    <meta name="theme-color" content="#0A0A0B" />
 
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ru_RU" />
     <meta property="og:site_name" content="HOLLYWOOD CAR DETAILING" />
-    <meta property="og:title" content="HOLLYWOOD CAR DETAILING — детейлинг в Ярославле" />
+    <meta
+      property="og:title"
+      content="HOLLYWOOD CAR DETAILING — студия полного образа авто"
+    />
     <meta
       property="og:description"
-      content="Место, где автомобиль обретает новое лицо. Запись в WhatsApp."
+      content="Свет, звук, защита и салон — в одном боксе. Ярославль, Ленинградский пр-т, 123Д."
     />
     <meta property="og:url" content={siteUrl} />
     <meta property="og:image" content={ogPath} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="HOLLYWOOD CAR DETAILING — детейлинг в Ярославле" />
+    <meta name="twitter:title" content="HOLLYWOOD CAR DETAILING" />
     <meta
       name="twitter:description"
-      content="Детейлинг, оклейка, полировка, химчистка, свет, звук, шумоизоляция, антикор, кастом."
+      content="Студия полного образа автомобиля в Ярославле."
     />
     <meta name="twitter:image" content={ogPath} />
 
@@ -193,7 +224,7 @@ const jsonLd = {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Oranienbaum&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
@@ -201,125 +232,176 @@ const jsonLd = {
   <body>
     <a class="skip" href="#main">К содержанию</a>
 
-    <header class="top">
-      <div class="top__bar">
-        <span>{address}</span>
-        <span>{hours}</span>
-        <a href={phoneHref}>{phoneDisplay}</a>
-      </div>
-      <div class="top__nav wrap">
-        <a class="mark" href="#main" aria-label="HOLLYWOOD CAR DETAILING">
-          <span class="mark__h">HOLLYWOOD</span>
-          <span class="mark__s">car detailing</span>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="brand" href="#main">
+          <span class="brand__mark">HOLLYWOOD</span>
+          <span class="brand__sub">car detailing</span>
         </a>
-        <nav aria-label="Разделы">
-          <a href="#services">Услуги</a>
-          <a href="#works">Работы</a>
-          <a href="#request">Заявка</a>
-          <a href="#contacts">Контакты</a>
+
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="site-nav"
+          data-nav-toggle
+        >
+          <span class="sr-only">Меню</span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+
+        <nav class="site-nav" id="site-nav" data-nav aria-label="Разделы">
+          <a href="#departments">Студия</a>
+          <a href="#premiere">Премьера</a>
+          <a href="#takes">Кадры</a>
+          <a href="#build">Запись</a>
+          <a href="#visit">Визит</a>
         </nav>
+
         <a
-          class="btn btn--solid"
+          class="btn btn--red header-cta"
           href={`${waBase}?text=${encodeURIComponent(defaultWa)}`}
           target="_blank"
-          rel="noopener noreferrer">WhatsApp</a
+          rel="noopener noreferrer">Записать авто</a
         >
       </div>
     </header>
 
     <main id="main">
       <section class="hero" aria-labelledby="hero-title">
-        <div class="hero__stage">
+        <div class="hero__media">
           <Image
-            class="hero__frame"
             src={keyArt}
-            alt="Фирменная обложка студии HOLLYWOOD CAR DETAILING"
+            alt="Фирменный кадр студии HOLLYWOOD CAR DETAILING"
             widths={[720, 1080, 1440, 1920]}
             sizes="100vw"
             loading="eager"
             fetchpriority="high"
             quality={82}
           />
-          <div class="hero__shade" aria-hidden="true"></div>
-          <div class="hero__copy wrap">
-            <p class="eyebrow">Детейлинг-центр · Ярославль</p>
-            <p class="hero__brand" aria-hidden="true">HOLLYWOOD</p>
-            <h1 id="hero-title">Место, где автомобиль<br />обретает новое лицо</h1>
-            <p class="hero__lead">
-              Кузов, салон, свет и звук — в одном боксе. Объём работ согласуем после осмотра.
-            </p>
-            <div class="hero__cta">
-              <a
-                class="btn btn--solid"
-                href={`${waBase}?text=${encodeURIComponent(defaultWa)}`}
-                target="_blank"
-                rel="noopener noreferrer">Написать в WhatsApp</a
-              >
-              <a class="btn btn--ghost" href="#request">Собрать заявку</a>
-            </div>
+          <div class="hero__veil" aria-hidden="true"></div>
+        </div>
+        <div class="hero__copy">
+          <p class="hero__brand" id="hero-title">HOLLYWOOD</p>
+          <p class="hero__tag">Студия полного образа автомобиля · Ярославль</p>
+          <p class="hero__lead">
+            Свет, звук, защита и салон — один бокс. Не мойка. Не «просто плёнка».
+          </p>
+          <div class="hero__actions">
+            <a
+              class="btn btn--red"
+              href={`${waBase}?text=${encodeURIComponent(defaultWa)}`}
+              target="_blank"
+              rel="noopener noreferrer">Записать авто</a
+            >
+            <a class="btn btn--ghost" href="#build">Собрать build</a>
           </div>
         </div>
+        <p class="hero__meta">
+          <a href={phoneHref}>{phoneDisplay}</a>
+          <span aria-hidden="true">·</span>
+          <span>{hours}</span>
+        </p>
       </section>
 
-      <section class="strip wrap" aria-label="Быстрые факты">
-        <p><strong>Бокс</strong>Закрытая парковка и видеонаблюдение</p>
-        <p><strong>Оплата</strong>Наличные, карта, безнал</p>
-        <p><strong>Сдача</strong>Гарантийный заказ-наряд</p>
-        <p><strong>Связь</strong><a href={phoneHref}>{phoneDisplay}</a></p>
-      </section>
-
-      <section class="services wrap" id="services" aria-labelledby="services-title">
-        <div class="services__head">
-          <h2 id="services-title">Направления студии</h2>
-          <p>Без фиксированных пакетов на сайте — состав работ собираем под конкретный автомобиль.</p>
+      <section class="departments" id="departments" aria-labelledby="dept-title">
+        <div class="section-head">
+          <h2 id="dept-title">Отделы студии</h2>
+          <p>Шесть направлений в одном пространстве — собираете образ целиком или точечно.</p>
         </div>
-        <ul class="services__list">
+        <ul class="dept-grid">
           {
-            services.map((item) => (
-              <li>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
+            departments.map((d) => (
+              <li class="dept" id={d.id}>
+                <p class="dept__en">{d.title}</p>
+                <h3 class="dept__ru">{d.ru}</h3>
+                <p class="dept__text">{d.text}</p>
               </li>
             ))
           }
         </ul>
       </section>
 
-      <section class="works" id="works" aria-labelledby="works-title">
-        <div class="wrap works__head">
-          <h2 id="works-title">Кадры из бокса</h2>
-          <p>Реальные фото из открытого профиля студии. Портфолио по кейсам пополним, когда появятся исходники.</p>
+      <section class="premiere" id="premiere" aria-labelledby="premiere-title">
+        <div class="section-head section-head--split">
+          <div>
+            <h2 id="premiere-title">Premiere Reveal</h2>
+            <p>
+              Потяните шторку света — кадр из бокса выходит из темноты. Так выглядит сдача:
+              машина на свет.
+            </p>
+          </div>
+          <p class="premiere__hint" data-reveal-hint>Тяните вправо →</p>
         </div>
-        <div class="film" role="list">
+
+        <div
+          class="reveal"
+          data-reveal
+          role="group"
+          aria-label="Интерактивное раскрытие кадра из бокса"
+        >
+          <div class="reveal__stage">
+            <Image
+              class="reveal__img"
+              src={audiThree}
+              alt="Audi A5 после работ в студии"
+              widths={[640, 960, 1280]}
+              sizes="(max-width: 900px) 100vw, 900px"
+              loading="lazy"
+              quality={80}
+            />
+            <div class="reveal__shade" data-reveal-shade aria-hidden="true"></div>
+            <div class="reveal__beam" data-reveal-beam aria-hidden="true"></div>
+          </div>
+          <label class="reveal__control">
+            <span class="sr-only">Положение светового луча</span>
+            <input
+              type="range"
+              min="8"
+              max="100"
+              value="28"
+              data-reveal-range
+              aria-valuemin="8"
+              aria-valuemax="100"
+              aria-valuenow="28"
+            />
+          </label>
+        </div>
+      </section>
+
+      <section class="takes" id="takes" aria-labelledby="takes-title">
+        <div class="section-head">
+          <h2 id="takes-title">Selected Takes</h2>
+          <p>Реальные фото из открытого профиля студии.</p>
+        </div>
+        <div class="takes__rail" tabindex="0" aria-label="Галерея работ, горизонтальный скролл">
           {
-            works.map((work) => (
-              <figure class="film__shot" role="listitem">
+            takes.map((take, i) => (
+              <figure class={`take take--${(i % 3) + 1}`}>
                 <Image
-                  src={work.image}
-                  alt={work.alt}
-                  widths={[320, 480, 720]}
-                  sizes="(max-width: 700px) 70vw, 320px"
+                  src={take.image}
+                  alt={take.alt}
+                  widths={[360, 540, 720]}
+                  sizes="(max-width: 700px) 75vw, 340px"
                   loading="lazy"
                   quality={78}
                 />
-                <figcaption>{work.caption}</figcaption>
+                <figcaption>{take.label}</figcaption>
               </figure>
             ))
           }
         </div>
-        <div class="wrap cases">
-          <p class="eyebrow">Модели в работе</p>
-          <ul>
-            {["BMW F32", "Audi", "LiXiang", "Mercedes GLE", "BMW M4"].map((item) => <li>{item}</li>)}
-          </ul>
-        </div>
       </section>
 
-      <section class="process wrap" aria-labelledby="process-title">
-        <h2 id="process-title">Как проходит работа</h2>
+      <section class="process" id="process" aria-labelledby="process-title">
+        <div class="section-head">
+          <h2 id="process-title">Как идёт build</h2>
+          <p>Короткий путь от сообщения до гарантийного заказ-наряда.</p>
+        </div>
         <ol class="process__list">
           {
-            process.map((step) => (
+            steps.map((step) => (
               <li>
                 <h3>{step.title}</h3>
                 <p>{step.text}</p>
@@ -329,83 +411,22 @@ const jsonLd = {
         </ol>
       </section>
 
-      <section class="request wrap" id="request" aria-labelledby="request-title">
-        <div class="request__intro">
-          <h2 id="request-title">Собрать заявку</h2>
+      <section class="voices" id="voices" aria-labelledby="voices-title">
+        <div class="section-head">
+          <h2 id="voices-title">Голоса с площадки</h2>
           <p>
-            Отметьте зоны и задачи. Текст соберётся в браузере и откроется в WhatsApp — ничего не
-            уходит на сервер, пока вы сами не нажмёте «Отправить» в мессенджере.
+            Фрагменты отзывов с
+            <a href={mapsUrl} target="_blank" rel="noopener noreferrer">Яндекс Карт</a>
+            и карточки организации. Рейтинг 5.0 · Good Place 2026.
           </p>
         </div>
-
-        <form id="builder" class="builder" novalidate>
-          <fieldset>
-            <legend>Зоны</legend>
-            {
-              zones.map((zone) => (
-                <label>
-                  <input type="checkbox" name="zone" value={zone} />
-                  <span>{zone}</span>
-                </label>
-              ))
-            }
-          </fieldset>
-          <fieldset>
-            <legend>Задачи</legend>
-            {
-              tasks.map((task) => (
-                <label>
-                  <input type="checkbox" name="task" value={task} />
-                  <span>{task}</span>
-                </label>
-              ))
-            }
-          </fieldset>
-          <label class="field">
-            <span>Марка и модель</span>
-            <input name="car" type="text" maxlength="80" autocomplete="off" placeholder="Например, BMW M4" />
-          </label>
-          <label class="field">
-            <span>Удобный день</span>
-            <input name="day" type="text" maxlength="40" autocomplete="off" placeholder="Например, суббота после 14:00" />
-          </label>
-          <label class="field field--wide">
-            <span>Комментарий</span>
-            <textarea name="detail" maxlength="200" rows="3" placeholder="Что важно учесть"></textarea>
-          </label>
-        </form>
-
-        <output id="preview" class="preview" for="builder" aria-live="polite"
-          >Отметьте параметры — здесь появится текст сообщения.</output
-        >
-
-        <div class="request__actions">
-          <a
-            id="waLink"
-            class="btn btn--solid"
-            href={`${waBase}?text=${encodeURIComponent(defaultWa)}`}
-            target="_blank"
-            rel="noopener noreferrer">Открыть WhatsApp</a
-          >
-          <a class="btn btn--ghost" href={phoneHref}>Позвонить</a>
-        </div>
-      </section>
-
-      <section class="trust wrap" aria-labelledby="trust-title">
-        <div class="trust__head">
-          <h2 id="trust-title">Что пишут клиенты</h2>
-          <p>
-            Фрагменты реальных отзывов с карточки организации.
-            <a href={mapsUrl} target="_blank" rel="noopener noreferrer">Источник на Яндекс Картах</a>
-          </p>
-        </div>
-        <ul class="trust__list">
+        <ul class="voices__list">
           {
-            reviews.map((review) => (
+            reviews.map((r) => (
               <li>
                 <blockquote>
-                  <p>{review.text}</p>
-                  <footer>— {review.name}</footer>
+                  <p>{r.text}</p>
+                  <footer>— {r.name}</footer>
                 </blockquote>
               </li>
             ))
@@ -413,71 +434,262 @@ const jsonLd = {
         </ul>
       </section>
 
-      <section class="contacts wrap" id="contacts" aria-labelledby="contacts-title">
-        <h2 id="contacts-title">Контакты</h2>
-        <div class="contacts__grid">
-          <div>
-            <p class="eyebrow">Адрес</p>
-            <p>{address}</p>
-            <p class="muted">Ориентир: Ленинградский проспект</p>
-          </div>
-          <div>
-            <p class="eyebrow">График</p>
-            <p>{hours}</p>
-          </div>
-          <div>
-            <p class="eyebrow">Связь</p>
-            <p><a href={phoneHref}>{phoneDisplay}</a></p>
-            <p>
-              <a href={`${waBase}?text=${encodeURIComponent(defaultWa)}`} target="_blank" rel="noopener noreferrer"
-                >WhatsApp</a
-              >
-            </p>
-            <p>
-              <a href={vkUrl} target="_blank" rel="noopener noreferrer">ВКонтакте</a>
-            </p>
-          </div>
+      <section class="build" id="build" aria-labelledby="build-title">
+        <div class="build__intro">
+          <h2 id="build-title">Build Sheet</h2>
+          <p>
+            Отметьте направления — текст соберётся в браузере и откроется в WhatsApp. Ничего не
+            уходит на сервер, пока вы сами не отправите сообщение.
+          </p>
         </div>
-        <a
-          class="btn btn--solid contacts__cta"
-          href={`${waBase}?text=${encodeURIComponent(defaultWa)}`}
-          target="_blank"
-          rel="noopener noreferrer">Рассказать о задаче в WhatsApp</a
+
+        <form id="builder" class="builder" novalidate>
+          <fieldset>
+            <legend>Направления</legend>
+            {
+              buildOptions.map((item) => (
+                <label class="chip">
+                  <input type="checkbox" name="dept" value={item} />
+                  <span>{item}</span>
+                </label>
+              ))
+            }
+          </fieldset>
+          <label class="field">
+            <span>Марка и модель</span>
+            <input
+              name="car"
+              type="text"
+              maxlength="80"
+              autocomplete="off"
+              placeholder="Например, Audi A5"
+            />
+          </label>
+          <label class="field">
+            <span>Удобный день</span>
+            <input
+              name="day"
+              type="text"
+              maxlength="40"
+              autocomplete="off"
+              placeholder="Суббота после 14:00"
+            />
+          </label>
+          <label class="field field--wide">
+            <span>Комментарий</span>
+            <textarea
+              name="detail"
+              maxlength="240"
+              rows="3"
+              placeholder="Что важно учесть"></textarea>
+          </label>
+        </form>
+
+        <output id="preview" class="preview" for="builder" aria-live="polite"
+          >Отметьте параметры — здесь появится текст сообщения.</output
         >
+
+        <div class="build__actions">
+          <a
+            id="waLink"
+            class="btn btn--red"
+            href={`${waBase}?text=${encodeURIComponent(defaultWa)}`}
+            target="_blank"
+            rel="noopener noreferrer">Открыть WhatsApp</a
+          >
+          <a class="btn btn--ghost" href={tgUrl} target="_blank" rel="noopener noreferrer"
+            >Telegram</a
+          >
+          <a class="btn btn--ghost" href={phoneHref}>Позвонить</a>
+        </div>
+      </section>
+
+      <section class="visit" id="visit" aria-labelledby="visit-title">
+        <div class="visit__copy">
+          <h2 id="visit-title">Визит</h2>
+          <dl class="visit__facts">
+            <div>
+              <dt>Адрес</dt>
+              <dd>
+                <a href={mapsUrl} target="_blank" rel="noopener noreferrer">{address}</a>
+              </dd>
+            </div>
+            <div>
+              <dt>График</dt>
+              <dd>{hours}<br />Воскресенье — выходной</dd>
+            </div>
+            <div>
+              <dt>Связь</dt>
+              <dd>
+                <a href={phoneHref}>{phoneDisplay}</a><br />
+                <a href={`${waBase}?text=${encodeURIComponent(defaultWa)}`} target="_blank" rel="noopener noreferrer"
+                  >WhatsApp</a
+                >
+                ·
+                <a href={tgUrl} target="_blank" rel="noopener noreferrer">Telegram</a>
+                ·
+                <a href={vkUrl} target="_blank" rel="noopener noreferrer">VK</a>
+              </dd>
+            </div>
+            <div>
+              <dt>На месте</dt>
+              <dd>Закрытая парковка, видеонаблюдение, зона ожидания, Wi‑Fi. Оплата: наличные, карта, безнал.</dd>
+            </div>
+          </dl>
+          <a
+            class="btn btn--red"
+            href={`${waBase}?text=${encodeURIComponent(defaultWa)}`}
+            target="_blank"
+            rel="noopener noreferrer">Записать авто</a
+          >
+        </div>
+        <div class="visit__map">
+          <iframe
+            title="Карта: HOLLYWOOD CAR DETAILING на Яндекс Картах"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            src="https://yandex.ru/map-widget/v1/?ol=biz&oid=239649973526&z=16&ll=39.7584%2C57.6993"
+          ></iframe>
+        </div>
       </section>
     </main>
 
-    <footer class="footer wrap">
-      <p>HOLLYWOOD CAR DETAILING · Ярославль</p>
-      <p>{address} · {hours}</p>
-      <p>
-        <a href={vkUrl} target="_blank" rel="noopener noreferrer">VK</a>
-        ·
-        <a href={mapsUrl} target="_blank" rel="noopener noreferrer">Карта</a>
-      </p>
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <p class="brand brand--footer">
+          <span class="brand__mark">HOLLYWOOD</span>
+          <span class="brand__sub">car detailing</span>
+        </p>
+        <p>{address}</p>
+        <p>
+          <a href={phoneHref}>{phoneDisplay}</a>
+          ·
+          <a href={vkUrl} target="_blank" rel="noopener noreferrer">VK</a>
+          ·
+          <a href={mapsUrl} target="_blank" rel="noopener noreferrer">Карта</a>
+        </p>
+        <p class="site-footer__legal">ИП Пеньевской Александр Леонидович</p>
+      </div>
     </footer>
 
     <script>
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      /* Mobile nav */
+      const toggle = document.querySelector("[data-nav-toggle]");
+      const nav = document.querySelector("[data-nav]");
+      if (toggle instanceof HTMLButtonElement && nav instanceof HTMLElement) {
+        const setOpen = (open: boolean) => {
+          toggle.setAttribute("aria-expanded", String(open));
+          nav.classList.toggle("is-open", open);
+          document.body.classList.toggle("nav-open", open);
+        };
+        toggle.addEventListener("click", () => {
+          setOpen(toggle.getAttribute("aria-expanded") !== "true");
+        });
+        nav.querySelectorAll("a").forEach((link) => {
+          link.addEventListener("click", () => setOpen(false));
+        });
+      }
+
+      /* Premiere Reveal */
+      const reveal = document.querySelector("[data-reveal]");
+      const shade = document.querySelector("[data-reveal-shade]");
+      const beam = document.querySelector("[data-reveal-beam]");
+      const range = document.querySelector("[data-reveal-range]");
+      const hint = document.querySelector("[data-reveal-hint]");
+
+      const applyReveal = (value: number) => {
+        const v = Math.min(100, Math.max(8, value));
+        if (shade instanceof HTMLElement) {
+          shade.style.setProperty("--reveal", `${v}%`);
+        }
+        if (beam instanceof HTMLElement) {
+          beam.style.setProperty("--reveal", `${v}%`);
+        }
+        if (range instanceof HTMLInputElement) {
+          range.value = String(v);
+          range.setAttribute("aria-valuenow", String(v));
+        }
+        if (hint instanceof HTMLElement && v > 55) {
+          hint.textContent = "Свет открыт";
+        }
+      };
+
+      if (range instanceof HTMLInputElement) {
+        range.addEventListener("input", () => applyReveal(Number(range.value)));
+        applyReveal(Number(range.value));
+      }
+
+      if (reveal instanceof HTMLElement && !reduceMotion) {
+        let dragging = false;
+        const fromClientX = (x: number) => {
+          const rect = reveal.getBoundingClientRect();
+          const pct = ((x - rect.left) / rect.width) * 100;
+          applyReveal(pct);
+        };
+        reveal.addEventListener("pointerdown", (e) => {
+          if ((e.target as HTMLElement).closest("input")) return;
+          dragging = true;
+          reveal.setPointerCapture(e.pointerId);
+          fromClientX(e.clientX);
+        });
+        reveal.addEventListener("pointermove", (e) => {
+          if (!dragging) return;
+          fromClientX(e.clientX);
+        });
+        reveal.addEventListener("pointerup", () => {
+          dragging = false;
+        });
+        reveal.addEventListener("pointercancel", () => {
+          dragging = false;
+        });
+      }
+
+      if (reduceMotion && shade instanceof HTMLElement) {
+        applyReveal(100);
+      }
+
+      /* Scroll reveals */
+      if (!reduceMotion && "IntersectionObserver" in window) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("is-in");
+                io.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
+        );
+        document
+          .querySelectorAll(".dept, .take, .process__list li, .voices__list li, .section-head")
+          .forEach((el) => {
+            el.classList.add("will-in");
+            io.observe(el);
+          });
+      }
+
+      /* Build Sheet → WhatsApp */
       const form = document.querySelector("#builder");
       const preview = document.querySelector("#preview");
       const waLink = document.querySelector("#waLink");
       const empty = "Отметьте параметры — здесь появится текст сообщения.";
-      const fallback = "Здравствуйте! Хочу обсудить работы по автомобилю.";
+      const fallback = "Здравствуйте! Хочу записаться в HOLLYWOOD CAR DETAILING.";
 
       const makeMessage = (): string | null => {
         if (!(form instanceof HTMLFormElement)) return null;
         const data = new FormData(form);
-        const zones = data.getAll("zone").map(String);
-        const tasks = data.getAll("task").map(String);
+        const depts = data.getAll("dept").map(String);
         const car = String(data.get("car") || "").trim();
         const day = String(data.get("day") || "").trim();
         const detail = String(data.get("detail") || "").trim();
-        if (!zones.length && !tasks.length && !car && !day && !detail) return null;
+        if (!depts.length && !car && !day && !detail) return null;
 
         const lines = [
           "Здравствуйте! Пишу с сайта HOLLYWOOD CAR DETAILING.",
-          `Зоны: ${zones.length ? zones.join(", ") : "нужна консультация"}`,
-          `Задачи: ${tasks.length ? tasks.join(", ") : "обсудим при осмотре"}`,
+          `Направления: ${depts.length ? depts.join(", ") : "нужна консультация"}`,
           `Автомобиль: ${car || "уточню в чате"}`,
         ];
         if (day) lines.push(`Удобный день: ${day}`);
