@@ -461,7 +461,6 @@ a:hover {
   width: 100%;
   height: clamp(200px, 28vw, 300px);
   object-fit: cover;
-  filter: contrast(1.05) saturate(0.92);
 }
 
 .take figcaption {

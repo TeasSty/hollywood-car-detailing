@@ -12,6 +12,8 @@ Thumbs.db
 *.log
 qa-*.png
 .qa/
+tools/
+tools/**
 
 # environment files
 .env
