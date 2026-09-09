@@ -100,15 +100,15 @@ const steps = [
   },
   {
     title: "Осмотр",
-    text: "В боксе смотрим объём и согласуем состав работ до старта.",
+    text: "В студии смотрим объём и согласуем работы до старта.",
   },
   {
-    title: "Продакшн",
+    title: "Работа",
     text: "Кузов, салон, свет, звук и защита — в одном месте.",
   },
   {
-    title: "Премьера",
-    text: "Сдача с гарантийным заказ-нарядом на работы и материалы.",
+    title: "Сдача",
+    text: "Отдаём авто с гарантийным заказ-нарядом.",
   },
 ];
 
@@ -253,9 +253,8 @@ const jsonLd = {
 
         <nav class="site-nav" id="site-nav" data-nav aria-label="Разделы">
           <a href="#departments">Студия</a>
-          <a href="#premiere">Премьера</a>
-          <a href="#takes">Кадры</a>
-          <a href="#build">Запись</a>
+          <a href="#takes">Работы</a>
+          <a href="#build">Заявка</a>
           <a href="#visit">Визит</a>
         </nav>
 
@@ -284,9 +283,9 @@ const jsonLd = {
         </div>
         <div class="hero__copy">
           <p class="hero__brand" id="hero-title">HOLLYWOOD</p>
-          <p class="hero__tag">Студия полного образа автомобиля · Ярославль</p>
+          <p class="hero__tag">Детейлинг и тюнинг в Ярославле</p>
           <p class="hero__lead">
-            Свет, звук, защита и салон — один бокс. Не мойка. Не «просто плёнка».
+            Оклейка, полировка, химчистка, свет и автозвук — в одной студии.
           </p>
           <div class="hero__actions">
             <a
@@ -295,7 +294,7 @@ const jsonLd = {
               target="_blank"
               rel="noopener noreferrer">Записать авто</a
             >
-            <a class="btn btn--ghost" href="#build">Собрать build</a>
+            <a class="btn btn--ghost" href="#build">Оставить заявку</a>
           </div>
         </div>
         <p class="hero__meta">
@@ -307,8 +306,8 @@ const jsonLd = {
 
       <section class="departments" id="departments" aria-labelledby="dept-title">
         <div class="section-head">
-          <h2 id="dept-title">Отделы студии</h2>
-          <p>Шесть направлений в одном пространстве — собираете образ целиком или точечно.</p>
+          <h2 id="dept-title">Услуги</h2>
+          <p>Можно сделать одну работу или несколько сразу.</p>
         </div>
         <ul class="dept-grid">
           {
@@ -323,67 +322,20 @@ const jsonLd = {
         </ul>
       </section>
 
-      <section class="premiere" id="premiere" aria-labelledby="premiere-title">
-        <div class="section-head section-head--split">
-          <div>
-            <h2 id="premiere-title">Premiere Reveal</h2>
-            <p>
-              Потяните шторку света — кадр из бокса выходит из темноты. Так выглядит сдача:
-              машина на свет.
-            </p>
-          </div>
-          <p class="premiere__hint" data-reveal-hint>Тяните вправо →</p>
-        </div>
-
-        <div
-          class="reveal"
-          data-reveal
-          role="group"
-          aria-label="Интерактивное раскрытие кадра из бокса"
-        >
-          <div class="reveal__stage">
-            <Image
-              class="reveal__img"
-              src={audiThree}
-              alt="Audi A5 после работ в студии"
-              widths={[640, 960, 1280]}
-              sizes="(max-width: 900px) 100vw, 900px"
-              loading="lazy"
-              quality={80}
-            />
-            <div class="reveal__shade" data-reveal-shade aria-hidden="true"></div>
-            <div class="reveal__beam" data-reveal-beam aria-hidden="true"></div>
-          </div>
-          <label class="reveal__control">
-            <span class="sr-only">Положение светового луча</span>
-            <input
-              type="range"
-              min="8"
-              max="100"
-              value="28"
-              data-reveal-range
-              aria-valuemin="8"
-              aria-valuemax="100"
-              aria-valuenow="28"
-            />
-          </label>
-        </div>
-      </section>
-
       <section class="takes" id="takes" aria-labelledby="takes-title">
         <div class="section-head">
-          <h2 id="takes-title">Selected Takes</h2>
-          <p>Реальные фото из открытого профиля студии.</p>
+          <h2 id="takes-title">Работы</h2>
+          <p>Фото из профиля студии.</p>
         </div>
-        <div class="takes__rail" tabindex="0" aria-label="Галерея работ, горизонтальный скролл">
+        <div class="takes__grid">
           {
-            takes.map((take, i) => (
-              <figure class={`take take--${(i % 3) + 1}`}>
+            takes.map((take) => (
+              <figure class="take">
                 <Image
                   src={take.image}
                   alt={take.alt}
                   widths={[360, 540, 720]}
-                  sizes="(max-width: 700px) 75vw, 340px"
+                  sizes="(max-width: 700px) 100vw, 33vw"
                   loading="lazy"
                   quality={78}
                 />
@@ -396,8 +348,8 @@ const jsonLd = {
 
       <section class="process" id="process" aria-labelledby="process-title">
         <div class="section-head">
-          <h2 id="process-title">Как идёт build</h2>
-          <p>Короткий путь от сообщения до гарантийного заказ-наряда.</p>
+          <h2 id="process-title">Как мы работаем</h2>
+          <p>От сообщения до сдачи автомобиля.</p>
         </div>
         <ol class="process__list">
           {
@@ -413,11 +365,11 @@ const jsonLd = {
 
       <section class="voices" id="voices" aria-labelledby="voices-title">
         <div class="section-head">
-          <h2 id="voices-title">Голоса с площадки</h2>
+          <h2 id="voices-title">Отзывы</h2>
           <p>
-            Фрагменты отзывов с
+            С{" "}
             <a href={mapsUrl} target="_blank" rel="noopener noreferrer">Яндекс Карт</a>
-            и карточки организации. Рейтинг 5.0 · Good Place 2026.
+            {" "}и карточки организации. Рейтинг 5.0 · Good Place 2026.
           </p>
         </div>
         <ul class="voices__list">
@@ -436,16 +388,13 @@ const jsonLd = {
 
       <section class="build" id="build" aria-labelledby="build-title">
         <div class="build__intro">
-          <h2 id="build-title">Build Sheet</h2>
-          <p>
-            Отметьте направления — текст соберётся в браузере и откроется в WhatsApp. Ничего не
-            уходит на сервер, пока вы сами не отправите сообщение.
-          </p>
+          <h2 id="build-title">Заявка</h2>
+          <p>Выберите услуги и нажмите WhatsApp — откроется готовое сообщение.</p>
         </div>
 
         <form id="builder" class="builder" novalidate>
           <fieldset>
-            <legend>Направления</legend>
+            <legend>Услуги</legend>
             {
               buildOptions.map((item) => (
                 <label class="chip">
@@ -486,7 +435,7 @@ const jsonLd = {
         </form>
 
         <output id="preview" class="preview" for="builder" aria-live="polite"
-          >Отметьте параметры — здесь появится текст сообщения.</output
+          >Выберите услуги — здесь появится текст для WhatsApp.</output
         >
 
         <div class="build__actions">
@@ -568,7 +517,6 @@ const jsonLd = {
           ·
           <a href={mapsUrl} target="_blank" rel="noopener noreferrer">Карта</a>
         </p>
-        <p class="site-footer__legal">ИП Пеньевской Александр Леонидович</p>
       </div>
     </footer>
 
@@ -592,64 +540,6 @@ const jsonLd = {
         });
       }
 
-      /* Premiere Reveal */
-      const reveal = document.querySelector("[data-reveal]");
-      const shade = document.querySelector("[data-reveal-shade]");
-      const beam = document.querySelector("[data-reveal-beam]");
-      const range = document.querySelector("[data-reveal-range]");
-      const hint = document.querySelector("[data-reveal-hint]");
-
-      const applyReveal = (value: number) => {
-        const v = Math.min(100, Math.max(8, value));
-        if (shade instanceof HTMLElement) {
-          shade.style.setProperty("--reveal", `${v}%`);
-        }
-        if (beam instanceof HTMLElement) {
-          beam.style.setProperty("--reveal", `${v}%`);
-        }
-        if (range instanceof HTMLInputElement) {
-          range.value = String(v);
-          range.setAttribute("aria-valuenow", String(v));
-        }
-        if (hint instanceof HTMLElement && v > 55) {
-          hint.textContent = "Свет открыт";
-        }
-      };
-
-      if (range instanceof HTMLInputElement) {
-        range.addEventListener("input", () => applyReveal(Number(range.value)));
-        applyReveal(Number(range.value));
-      }
-
-      if (reveal instanceof HTMLElement && !reduceMotion) {
-        let dragging = false;
-        const fromClientX = (x: number) => {
-          const rect = reveal.getBoundingClientRect();
-          const pct = ((x - rect.left) / rect.width) * 100;
-          applyReveal(pct);
-        };
-        reveal.addEventListener("pointerdown", (e) => {
-          if ((e.target as HTMLElement).closest("input")) return;
-          dragging = true;
-          reveal.setPointerCapture(e.pointerId);
-          fromClientX(e.clientX);
-        });
-        reveal.addEventListener("pointermove", (e) => {
-          if (!dragging) return;
-          fromClientX(e.clientX);
-        });
-        reveal.addEventListener("pointerup", () => {
-          dragging = false;
-        });
-        reveal.addEventListener("pointercancel", () => {
-          dragging = false;
-        });
-      }
-
-      if (reduceMotion && shade instanceof HTMLElement) {
-        applyReveal(100);
-      }
-
       /* Scroll reveals */
       if (!reduceMotion && "IntersectionObserver" in window) {
         const io = new IntersectionObserver(
@@ -671,11 +561,11 @@ const jsonLd = {
           });
       }
 
-      /* Build Sheet → WhatsApp */
+      /* Заявка → WhatsApp */
       const form = document.querySelector("#builder");
       const preview = document.querySelector("#preview");
       const waLink = document.querySelector("#waLink");
-      const empty = "Отметьте параметры — здесь появится текст сообщения.";
+      const empty = "Выберите услуги — здесь появится текст для WhatsApp.";
       const fallback = "Здравствуйте! Хочу записаться в HOLLYWOOD CAR DETAILING.";
 
       const makeMessage = (): string | null => {
@@ -689,7 +579,7 @@ const jsonLd = {
 
         const lines = [
           "Здравствуйте! Пишу с сайта HOLLYWOOD CAR DETAILING.",
-          `Направления: ${depts.length ? depts.join(", ") : "нужна консультация"}`,
+          `Услуги: ${depts.length ? depts.join(", ") : "нужна консультация"}`,
           `Автомобиль: ${car || "уточню в чате"}`,
         ];
         if (day) lines.push(`Удобный день: ${day}`);
