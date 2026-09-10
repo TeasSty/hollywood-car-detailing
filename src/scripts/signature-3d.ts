@@ -226,10 +226,10 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     const center = box.getCenter(new THREE.Vector3());
     object.position.sub(center);
     const maxDim = Math.max(size.x, size.y, size.z) || 1;
-    const scale = 2.45 / maxDim;
+    const scale = 2.35 / maxDim;
     object.scale.setScalar(scale);
-    // Stronger ¾ yaw so the nose faces the viewer clearly
-    object.rotation.y = Math.PI * 0.32;
+    // Right-side ¾ toward viewer (mirror of prior left-flank pose)
+    object.rotation.y = -Math.PI * 0.34;
     object.updateMatrixWorld(true);
   };
 
@@ -268,6 +268,19 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     return linesRoot;
   };
 
+  const frameCamera = () => {
+    if (!camera || !canvasHost) return;
+    const w = canvasHost.clientWidth || 1;
+    const h = canvasHost.clientHeight || 1;
+    const aspect = w / h;
+    // Pull back on tall/narrow phones so the car stays centered in frame
+    const dist = aspect < 0.9 ? 5.1 : aspect < 1.2 ? 4.55 : 4.15;
+    const elev = aspect < 0.9 ? 1.15 : 0.95;
+    // Camera on car's right / front-right — right flank toward viewer
+    camera.position.set(-dist * 0.58, elev, dist * 0.82);
+    camera.lookAt(0, 0.02, 0);
+  };
+
   const paint = () => {
     if (!renderer || !scene || !camera) return;
     renderer.render(scene, camera);
@@ -283,6 +296,7 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    frameCamera();
     paint();
   };
 
@@ -320,11 +334,10 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     scn.fog = new three.Fog(0x050506, 7, 16);
     scene = scn;
 
-    // Fixed ¾ front camera — no orbit, no fly-to
+    // Fixed ¾ front-right camera — no orbit, no fly-to
     const cam = new three.PerspectiveCamera(34, 1, 0.1, 40);
-    cam.position.set(2.55, 1.05, 3.55);
-    cam.lookAt(0, 0.02, 0);
     camera = cam;
+    frameCamera();
 
     const rend = new three.WebGLRenderer({
       antialias: true,
@@ -397,13 +410,22 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
       const mark = new three.Object3D();
       mark.name = `sig-mark-${z.id}`;
       // uvw → model-local (car axes): u left→right, v bottom→top, w rear→front
+      // Slight inward bias on v so dots sit on body skin, not AABB lid (mirrors/roof trim)
+      const vBody = clamp(z.uvw[1] * 0.92);
       mark.position.set(
         boxMin.x + boxSize.x * clamp(z.uvw[0]),
-        boxMin.y + boxSize.y * clamp(z.uvw[1]),
+        boxMin.y + boxSize.y * vBody,
         boxMin.z + boxSize.z * clamp(z.uvw[2]),
       );
       markerRoot.add(mark);
     }
+
+    // Re-center whole assembly in viewport (fixes mobile off-center silhouette)
+    rootGroup.updateMatrixWorld(true);
+    const worldBox = new three.Box3().setFromObject(rootGroup);
+    const worldCenter = worldBox.getCenter(new three.Vector3());
+    rootGroup.position.sub(worldCenter);
+    rootGroup.updateMatrixWorld(true);
 
     calloutsSvg.innerHTML = "";
     hotspotsUl.innerHTML = "";

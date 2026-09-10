@@ -14,31 +14,29 @@ interface Props {
 const { prices, waHref, modelUrl } = Astro.props;
 
 /**
- * 1 hotspot ↔ 1 unique Hollywood price row.
- * `uvw` = normalized AABB coords on the fitted car:
- *   u 0→1 left→right, v 0→1 bottom→top, w 0→1 rear→front
- * (snaps dots onto body — not free-floating world guesses)
+ * ~6 popular services only — spaced for right-side ¾ view (no overlapping labels).
+ * `uvw` = normalized car AABB: u left→right, v bottom→top, w rear→front
  */
 const zones = [
-  {
-    id: "polish",
-    title: "Полировка",
-    subtitle: "кузов / ЛКП",
-    price: "от 14 000 ₽",
-    priceId: "price-polish",
-    uvw: [0.52, 0.82, 0.48] as [number, number, number],
-    side: "top" as const,
-    labelBias: [-2, -14],
-  },
   {
     id: "ppf",
     title: "Плёнка",
     subtitle: "капот и бампер",
     price: "от 12 000 ₽",
     priceId: "price-ppf",
-    uvw: [0.48, 0.52, 0.88] as [number, number, number],
+    uvw: [0.52, 0.42, 0.88] as [number, number, number],
     side: "left" as const,
-    labelBias: [-18, -12],
+    labelBias: [-22, -16],
+  },
+  {
+    id: "polish",
+    title: "Полировка",
+    subtitle: "кузов / ЛКП",
+    price: "от 14 000 ₽",
+    priceId: "price-polish",
+    uvw: [0.58, 0.64, 0.5] as [number, number, number],
+    side: "top" as const,
+    labelBias: [2, -20],
   },
   {
     id: "ceramic",
@@ -46,19 +44,9 @@ const zones = [
     subtitle: "защитный слой",
     price: "от 18 900 ₽",
     priceId: "price-ceramic",
-    uvw: [0.82, 0.58, 0.42] as [number, number, number],
+    uvw: [0.9, 0.45, 0.38] as [number, number, number],
     side: "right" as const,
-    labelBias: [16, -10],
-  },
-  {
-    id: "glasscoat",
-    title: "Стёкла",
-    subtitle: "жидкое стекло",
-    price: "от 5 000 ₽",
-    priceId: "price-glasscoat",
-    uvw: [0.5, 0.74, 0.68] as [number, number, number],
-    side: "right" as const,
-    labelBias: [14, -16],
+    labelBias: [20, -10],
   },
   {
     id: "biled",
@@ -66,19 +54,9 @@ const zones = [
     subtitle: "линзы",
     price: "от 12 000 ₽",
     priceId: "price-biled",
-    uvw: [0.22, 0.4, 0.94] as [number, number, number],
-    side: "left" as const,
-    labelBias: [-16, 10],
-  },
-  {
-    id: "headlights",
-    title: "Фары",
-    subtitle: "полировка",
-    price: "от 3 500 ₽",
-    priceId: "price-headlights",
-    uvw: [0.72, 0.4, 0.94] as [number, number, number],
+    uvw: [0.78, 0.34, 0.94] as [number, number, number],
     side: "right" as const,
-    labelBias: [14, 8],
+    labelBias: [18, 16],
   },
   {
     id: "interior",
@@ -86,39 +64,9 @@ const zones = [
     subtitle: "химчистка",
     price: "уточняйте",
     priceId: "price-interior",
-    uvw: [0.28, 0.56, 0.55] as [number, number, number],
+    uvw: [0.86, 0.48, 0.58] as [number, number, number],
     side: "left" as const,
-    labelBias: [-16, 2],
-  },
-  {
-    id: "audio",
-    title: "Автозвук",
-    subtitle: "магнитола",
-    price: "от 6 000 ₽",
-    priceId: "price-audio",
-    uvw: [0.42, 0.5, 0.62] as [number, number, number],
-    side: "left" as const,
-    labelBias: [-14, 16],
-  },
-  {
-    id: "noise",
-    title: "Шумка",
-    subtitle: "арки / двери",
-    price: "от 6 000 ₽",
-    priceId: "price-noise",
-    uvw: [0.12, 0.22, 0.7] as [number, number, number],
-    side: "bottom" as const,
-    labelBias: [-10, 12],
-  },
-  {
-    id: "retrim",
-    title: "Перетяжка",
-    subtitle: "салон",
-    price: "от 15 000 ₽",
-    priceId: "price-retrim",
-    uvw: [0.55, 0.54, 0.4] as [number, number, number],
-    side: "right" as const,
-    labelBias: [18, 4],
+    labelBias: [-24, 8],
   },
   {
     id: "anticor",
@@ -126,39 +74,9 @@ const zones = [
     subtitle: "днище",
     price: "от 20 000 ₽",
     priceId: "price-anticor",
-    uvw: [0.5, 0.12, 0.18] as [number, number, number],
+    uvw: [0.55, 0.12, 0.2] as [number, number, number],
     side: "bottom" as const,
-    labelBias: [12, 14],
-  },
-  {
-    id: "ambient",
-    title: "Подсветка",
-    subtitle: "контур",
-    price: "от 15 000 ₽",
-    priceId: "price-ambient",
-    uvw: [0.2, 0.48, 0.38] as [number, number, number],
-    side: "left" as const,
-    labelBias: [-18, -6],
-  },
-  {
-    id: "alarm",
-    title: "Сигналка",
-    subtitle: "охрана",
-    price: "от 11 000 ₽",
-    priceId: "price-alarm",
-    uvw: [0.48, 0.6, 0.78] as [number, number, number],
-    side: "top" as const,
-    labelBias: [10, -12],
-  },
-  {
-    id: "custom",
-    title: "Кастом",
-    subtitle: "допы",
-    price: "уточняйте",
-    priceId: "price-custom",
-    uvw: [0.58, 0.62, 0.12] as [number, number, number],
-    side: "right" as const,
-    labelBias: [16, 14],
+    labelBias: [-6, 18],
   },
 ];
 
@@ -169,15 +87,6 @@ for (const row of prices) {
   if (seen.has(row.id)) continue;
   seen.add(row.id);
   uniquePrices.push(row);
-}
-/** Every listed Hollywood price must have a zone; keep list order from prices */
-const orderedPrices = uniquePrices.filter((r) => zonePriceIds.has(r.id));
-const missing = uniquePrices.filter((r) => !zonePriceIds.has(r.id));
-if (missing.length) {
-  console.warn(
-    "[SignatureViewer] prices without hotspot:",
-    missing.map((m) => m.id).join(", "),
-  );
 }
 
 const zoneByPrice: Record<string, string> = {};
@@ -229,27 +138,17 @@ const zonesJson = JSON.stringify(zones);
     </div>
   </div>
 
-  <p class="signature__credit">
-    3D: CarConcept —
-    <a
-      href="https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept"
-      target="_blank"
-      rel="noopener noreferrer">Khronos glTF Sample Assets</a
-    >
-    (исходник Unity Fan, CC0; сборка Khronos). Wireframe / studio look — HOLLYWOOD site.
-  </p>
-
   <div class="signature__prices" id="prices" data-sig-prices>
     <div class="signature__prices-head">
       <p class="signature__panel-kicker">Прайс</p>
       <h3 class="signature__prices-title">Цены</h3>
       <p class="signature__prices-lead">
-        Стартовые цены с Яндекс Карт. Одна услуга — одна точка на схеме и одна строка.
+        Стартовые цены с Яндекс Карт. Точки на схеме — популярные зоны; полный список услуг ниже.
       </p>
     </div>
     <ul class="signature__price-list" data-sig-price-list>
       {
-        orderedPrices.map((row) => (
+        uniquePrices.map((row) => (
           <li
             class="price-list__row"
             id={row.id}

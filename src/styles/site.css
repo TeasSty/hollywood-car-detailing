@@ -752,21 +752,6 @@ a:hover {
   transition: filter 0.35s var(--ease);
 }
 
-.signature__credit {
-  width: var(--wrap);
-  margin: 0.65rem auto 0;
-  font-size: 0.72rem;
-  line-height: 1.4;
-  color: var(--mute);
-  max-width: 48rem;
-}
-
-.signature__credit a {
-  color: rgba(201, 162, 74, 0.9);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
 @media (max-width: 700px) {
   .signature__art-wrap {
     aspect-ratio: 1.55 / 1;
@@ -774,8 +759,12 @@ a:hover {
   }
 
   .signature__art-wrap--3d {
-    aspect-ratio: 4 / 5;
-    min-height: clamp(300px, 92vw, 520px);
+    aspect-ratio: 3 / 4;
+    min-height: clamp(320px, 88vw, 540px);
+  }
+
+  .signature__label-sub {
+    display: none;
   }
 }
 
