@@ -19,3 +19,6 @@ tools/**
 .env
 .env.*
 !.env.example
+
+tmp-svg-candidates/
+

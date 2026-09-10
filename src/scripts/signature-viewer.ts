@@ -8,19 +8,41 @@ const zonePriceIds: Record<string, string[]> = {
   anticor: ["price-anticor"],
 };
 
+const TIER_ORDER: Record<string, number> = {
+  main: 0,
+  body: 1,
+  panel: 2,
+  detail: 3,
+};
+
+function clamp(n: number, min = 0, max = 1) {
+  return Math.min(max, Math.max(min, n));
+}
+
 export function initSignatureViewer(root: HTMLElement) {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const stage = root.querySelector("[data-sig-stage]");
+  const stage = root.querySelector<HTMLElement>("[data-sig-stage]");
   const priceList = root.querySelector("[data-sig-price-list]");
   const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-sig-hot]"));
   const priceRows = Array.from(root.querySelectorAll<HTMLElement>("[data-sig-price-row]"));
   const lines = Array.from(root.querySelectorAll<SVGPathElement>("[data-sig-line]"));
   const wraps = Array.from(root.querySelectorAll<HTMLElement>("[data-sig-hot-wrap]"));
   const labels = Array.from(root.querySelectorAll<HTMLElement>("[data-sig-label]"));
-  const carStrokes = Array.from(root.querySelectorAll<SVGPathElement | SVGCircleElement | SVGEllipseElement | SVGRectElement>(".signature__stroke-draw"));
+  const carStrokes = Array.from(
+    root.querySelectorAll<SVGGeometryElement>(".signature__stroke-draw"),
+  ).sort((a, b) => {
+    const ta = TIER_ORDER[a.getAttribute("data-tier") || "panel"] ?? 2;
+    const tb = TIER_ORDER[b.getAttribute("data-tier") || "panel"] ?? 2;
+    if (ta !== tb) return ta - tb;
+    const oa = Number(a.getAttribute("data-draw-order") || 0);
+    const ob = Number(b.getAttribute("data-draw-order") || 0);
+    return oa - ob;
+  });
 
   let activeId: string | null = null;
   let ready = false;
+  let drawComplete = false;
+  const strokeLens: number[] = [];
 
   const markReady = () => {
     if (ready) return;
@@ -119,53 +141,89 @@ export function initSignatureViewer(root: HTMLElement) {
     }
   };
 
-  const runStrokeDraw = () => {
-    if (reduceMotion) {
-      markReady();
-      return;
-    }
+  const prepareStrokes = () => {
     carStrokes.forEach((el, i) => {
       try {
-        const len = el.getTotalLength();
-        el.style.setProperty("--sig-len", String(len));
+        const len = Math.max(el.getTotalLength(), 1);
+        strokeLens[i] = len;
         el.style.strokeDasharray = String(len);
         el.style.strokeDashoffset = String(len);
-        el.style.animationDelay = `${Math.min(i * 0.018, 0.55)}s`;
-        el.classList.add("is-drawing");
+        el.classList.add("is-armed");
       } catch {
-        /* getTotalLength unsupported on some shapes — skip */
+        strokeLens[i] = 0;
       }
     });
-    lines.forEach((line, i) => {
+
+    lines.forEach((line) => {
       try {
-        const len = line.getTotalLength();
+        const len = Math.max(line.getTotalLength(), 1);
         line.style.setProperty("--sig-len", String(len));
         line.style.strokeDasharray = String(len);
         line.style.strokeDashoffset = String(len);
-        line.style.animationDelay = `${0.45 + i * 0.06}s`;
-        line.classList.add("is-drawing");
       } catch {
         /* skip */
       }
     });
-    markReady();
   };
 
-  if ("IntersectionObserver" in window && stage) {
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            runStrokeDraw();
-            io.disconnect();
-          }
-        });
-      },
-      { threshold: 0.2, rootMargin: "0px 0px -8% 0px" },
-    );
-    io.observe(stage);
+  const applyDrawProgress = (progress: number) => {
+    const p = clamp(progress);
+    const n = carStrokes.length;
+    if (n === 0) return;
+
+    // Main outline finishes by ~0.45, panels through ~0.82, details to 1
+    carStrokes.forEach((el, i) => {
+      const len = strokeLens[i];
+      if (!len) return;
+      const start = i / n;
+      const end = Math.min(1, (i + 1.35) / n);
+      const local = clamp((p - start) / Math.max(end - start, 0.001));
+      el.style.strokeDashoffset = String(len * (1 - local));
+    });
+
+    if (p >= 0.92 && !drawComplete) {
+      drawComplete = true;
+      markReady();
+      lines.forEach((line, i) => {
+        line.style.animationDelay = `${0.05 + i * 0.05}s`;
+        line.classList.add("is-drawing");
+      });
+    }
+  };
+
+  const sectionProgress = () => {
+    if (!stage) return 1;
+    const rect = stage.getBoundingClientRect();
+    const vh = window.innerHeight || 1;
+    // Start drawing when section enters lower viewport; finish as it centers
+    const start = vh * 0.88;
+    const end = vh * 0.28;
+    return clamp((start - rect.top) / Math.max(start - end, 1));
+  };
+
+  let ticking = false;
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      if (reduceMotion || drawComplete) {
+        applyDrawProgress(1);
+        return;
+      }
+      applyDrawProgress(sectionProgress());
+    });
+  };
+
+  prepareStrokes();
+
+  if (reduceMotion) {
+    applyDrawProgress(1);
+    markReady();
   } else {
-    runStrokeDraw();
+    applyDrawProgress(sectionProgress());
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
   }
 
   buttons.forEach((btn) => {
@@ -181,12 +239,7 @@ export function initSignatureViewer(root: HTMLElement) {
     btn.addEventListener("click", () => {
       const z = id();
       if (!z) return;
-      if (activeId === z) {
-        /* keep lit on second click — sticky selection for touch */
-        activate(z, { scrollPrices: true });
-      } else {
-        activate(z, { scrollPrices: true });
-      }
+      activate(z, { scrollPrices: true });
     });
   });
 

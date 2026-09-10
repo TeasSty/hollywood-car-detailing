@@ -715,33 +715,57 @@ a:hover {
 .signature__art-wrap {
   position: relative;
   isolation: isolate;
-  min-height: clamp(320px, 58vw, 560px);
+  width: min(100%, 720px);
+  margin-inline: auto;
+  aspect-ratio: 1 / 1;
+  min-height: clamp(300px, 78vw, 640px);
   background:
-    radial-gradient(ellipse 55% 40% at 50% 70%, rgba(201, 162, 74, 0.07), transparent 70%),
+    radial-gradient(ellipse 55% 40% at 50% 55%, rgba(201, 162, 74, 0.07), transparent 70%),
     #050505;
   border: 1px solid rgba(244, 241, 234, 0.08);
   overflow: hidden;
 }
 
-.signature__car {
+.signature__car-mount {
   position: absolute;
-  left: 50%;
-  top: 54%;
-  width: min(92%, 820px);
-  height: auto;
-  transform: translate(-50%, -50%);
-  color: rgba(244, 241, 234, 0.88);
+  inset: 0;
+  display: grid;
+  place-items: center;
   pointer-events: none;
-  opacity: 0.92;
+}
+
+.signature__car {
+  position: relative;
+  left: auto;
+  top: auto;
+  width: min(94%, 640px);
+  height: auto;
+  color: rgba(228, 228, 222, 0.92);
+  transform: none;
+  pointer-events: none;
+  opacity: 0.94;
   transition: opacity 0.4s var(--ease);
 }
 
 .signature.is-focused .signature__car {
-  opacity: 0.55;
+  opacity: 0.5;
 }
 
-.signature__stroke-draw.is-drawing {
-  animation: sig-stroke-draw 1.15s var(--ease) forwards;
+.signature__stroke-draw.is-armed {
+  /* dashoffset driven by scroll in signature-viewer.ts */
+  vector-effect: non-scaling-stroke;
+}
+
+.signature__stroke--main {
+  color: rgba(245, 245, 240, 0.98);
+}
+
+.signature__stroke--panel {
+  color: rgba(210, 210, 205, 0.85);
+}
+
+.signature__stroke--detail {
+  color: rgba(180, 180, 175, 0.7);
 }
 
 @keyframes sig-stroke-draw {
@@ -1079,12 +1103,12 @@ a:hover {
 
 @media (max-width: 700px) {
   .signature__art-wrap {
-    min-height: clamp(380px, 110vw, 520px);
+    width: 100%;
+    min-height: clamp(300px, 92vw, 520px);
   }
 
   .signature__car {
-    width: 108%;
-    top: 48%;
+    width: min(98%, 520px);
   }
 
   .signature__label-price {
