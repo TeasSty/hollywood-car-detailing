@@ -14,7 +14,7 @@ interface Props {
 const { prices, waHref, modelUrl } = Astro.props;
 
 /**
- * ~6 popular services only — spaced for right-side ¾ view (no overlapping labels).
+ * Popular services for 3D hotspots — spaced for right-side ¾ view.
  * `uvw` = normalized car AABB: u left→right, v bottom→top, w rear→front
  */
 const zones = [
@@ -90,7 +90,6 @@ const zones = [
   },
 ];
 
-const zonePriceIds = new Set(zones.map((z) => z.priceId));
 const seen = new Set<string>();
 const uniquePrices: PriceRow[] = [];
 for (const row of prices) {
@@ -113,6 +112,7 @@ const zonesJson = JSON.stringify(zones);
   data-signature
   data-sig-3d
   data-model-url={modelUrl}
+  data-wa-href={waHref}
 >
   <div class="signature__head">
     <div class="signature__head-copy">
@@ -121,9 +121,11 @@ const zonesJson = JSON.stringify(zones);
         <span class="signature__title-light">Детейлинг</span>
         <span class="signature__title-gold">полный уход</span>
       </h2>
-      <p class="signature__lead">
-        3D-схема кузова: нажмите зону — подсветятся линия, подпись и строка прайса. Реальные услуги
-        студии HOLLYWOOD.
+      <p class="signature__lead signature__lead--desktop">
+        Нажмите зону на 3D — справа подсветится строка прайса. Реальные услуги студии HOLLYWOOD.
+      </p>
+      <p class="signature__lead signature__lead--mobile">
+        Нажмите зону на машине — под схемой появится услуга и цена.
       </p>
     </div>
     <p class="signature__badge" aria-label={`Цены стартуют ${fromPrice}`}>
@@ -131,53 +133,97 @@ const zonesJson = JSON.stringify(zones);
     </p>
   </div>
 
-  <div class="signature__diagram" data-sig-stage>
-    <div class="signature__art-wrap signature__art-wrap--3d">
-      <div class="signature__canvas-host" data-sig-canvas></div>
+  <div class="signature__body">
+    <div class="signature__stage-col">
+      <div class="signature__diagram" data-sig-stage>
+        <div class="signature__art-wrap signature__art-wrap--3d">
+          <div class="signature__canvas-host" data-sig-canvas></div>
 
-      <svg
-        class="signature__callouts"
-        data-sig-callouts
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-        focusable="false"></svg>
+          <svg
+            class="signature__callouts"
+            data-sig-callouts
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+            focusable="false"></svg>
 
-      <ul class="signature__hotspots" data-sig-hotspots></ul>
-      <ul class="signature__labels" data-sig-labels aria-hidden="true"></ul>
-    </div>
-  </div>
+          <ul class="signature__hotspots" data-sig-hotspots></ul>
+          <ul class="signature__labels" data-sig-labels aria-hidden="true"></ul>
+        </div>
+      </div>
 
-  <div class="signature__prices" id="prices" data-sig-prices>
-    <div class="signature__prices-head">
-      <p class="signature__panel-kicker">Прайс</p>
-      <h3 class="signature__prices-title">Цены</h3>
-      <p class="signature__prices-lead">
-        Стартовые цены с Яндекс Карт. Точки на схеме — популярные зоны; полный список услуг ниже.
-      </p>
-    </div>
-    <ul class="signature__price-list" data-sig-price-list>
-      {
-        uniquePrices.map((row) => (
-          <li
-            class="price-list__row"
-            id={row.id}
-            data-sig-price-row={row.id}
-            data-zone={zoneByPrice[row.id] ?? ""}
-            tabindex="0"
-          >
-            <span class="price-list__name">{row.title}</span>
-            <span class="price-list__sum">{row.price}</span>
-          </li>
-        ))
-      }
-    </ul>
-    <div class="signature__prices-cta">
-      <p>Нужна другая услуга — напишите, подскажем по авто.</p>
-      <a class="btn btn--solid" href={waHref} target="_blank" rel="noopener noreferrer"
-        >Уточнить в WhatsApp</a
+      <aside
+        class="signature__pick"
+        data-sig-pick
+        aria-live="polite"
+        aria-atomic="true"
       >
+        <p class="signature__pick-hint" data-sig-pick-hint>Выберите зону на машине</p>
+        <div class="signature__pick-card" data-sig-pick-card hidden>
+          <p class="signature__pick-kicker">Услуга</p>
+          <h3 class="signature__pick-title" data-sig-pick-title></h3>
+          <p class="signature__pick-sub" data-sig-pick-sub></p>
+          <p class="signature__pick-price" data-sig-pick-price></p>
+          <a
+            class="btn btn--solid signature__pick-wa"
+            data-sig-pick-wa
+            href={waHref}
+            target="_blank"
+            rel="noopener noreferrer">Уточнить в WhatsApp</a
+          >
+        </div>
+      </aside>
+
+      <details class="signature__more-prices">
+        <summary>Весь прайс</summary>
+        <ul class="signature__price-list signature__price-list--compact" data-sig-price-list-mobile>
+          {
+            uniquePrices.map((row) => (
+              <li
+                class="price-list__row"
+                data-sig-price-row-mobile={row.id}
+                data-zone={zoneByPrice[row.id] ?? ""}
+              >
+                <span class="price-list__name">{row.title}</span>
+                <span class="price-list__sum">{row.price}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </details>
     </div>
+
+    <aside class="signature__prices" id="prices" data-sig-prices>
+      <div class="signature__prices-head">
+        <p class="signature__panel-kicker">Прайс</p>
+        <h3 class="signature__prices-title">Цены</h3>
+        <p class="signature__prices-lead">
+          Стартовые цены с Яндекс Карт. Зона на схеме подсвечивает строку.
+        </p>
+      </div>
+      <ul class="signature__price-list" data-sig-price-list>
+        {
+          uniquePrices.map((row) => (
+            <li
+              class="price-list__row"
+              id={row.id}
+              data-sig-price-row={row.id}
+              data-zone={zoneByPrice[row.id] ?? ""}
+              tabindex="0"
+            >
+              <span class="price-list__name">{row.title}</span>
+              <span class="price-list__sum">{row.price}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="signature__prices-cta">
+        <p>Нужна другая услуга — напишите, подскажем по авто.</p>
+        <a class="btn btn--solid" href={waHref} target="_blank" rel="noopener noreferrer"
+          >Уточнить в WhatsApp</a
+        >
+      </div>
+    </aside>
   </div>
 
   <p class="signature__note">Цены — из карточки на Яндекс Картах. Итоговая сумма после осмотра авто.</p>

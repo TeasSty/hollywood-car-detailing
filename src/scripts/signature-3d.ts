@@ -81,14 +81,46 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
   let boxSize: Vector3 | null = null;
   let boxMin: Vector3 | null = null;
 
+  const pick = root.querySelector<HTMLElement>("[data-sig-pick]");
+  const pickHint = root.querySelector<HTMLElement>("[data-sig-pick-hint]");
+  const pickCard = root.querySelector<HTMLElement>("[data-sig-pick-card]");
+  const pickTitle = root.querySelector<HTMLElement>("[data-sig-pick-title]");
+  const pickSub = root.querySelector<HTMLElement>("[data-sig-pick-sub]");
+  const pickPrice = root.querySelector<HTMLElement>("[data-sig-pick-price]");
+  const pickWa = root.querySelector<HTMLAnchorElement>("[data-sig-pick-wa]");
+  const waHref = root.dataset.waHref || pickWa?.href || "";
+
   const zoneByPrice: Record<string, string> = {};
   for (const z of zones) zoneByPrice[z.priceId] = z.id;
+
+  const updatePickPanel = (id: string | null) => {
+    if (!pick || !pickCard || !pickHint) return;
+    const z = id ? zones.find((x) => x.id === id) : null;
+    if (!z) {
+      pickCard.hidden = true;
+      pickHint.hidden = false;
+      pick.removeAttribute("data-active");
+      return;
+    }
+    pickHint.hidden = true;
+    pickCard.hidden = false;
+    pick.setAttribute("data-active", z.id);
+    if (pickTitle) pickTitle.textContent = z.title;
+    if (pickSub) pickSub.textContent = z.subtitle;
+    if (pickPrice) pickPrice.textContent = z.price;
+    if (pickWa) {
+      const msg = `Здравствуйте! Интересует: ${z.title} (${z.price}).`;
+      const base = waHref.split("?")[0] || waHref;
+      pickWa.href = `${base}?text=${encodeURIComponent(msg)}`;
+    }
+  };
 
   const markReady = () => {
     if (ready) return;
     ready = true;
     root.classList.add("is-ready");
     if (reduceMotion) root.classList.add("is-instant");
+    updatePickPanel(null);
   };
 
   const finishDraw = () => {
@@ -157,6 +189,8 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
         lineMat.opacity = 0.35;
       }
     }
+
+    updatePickPanel(id);
   };
 
   const clearPriceHighlight = () => {
@@ -187,7 +221,14 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     setActive(id);
     clearPriceHighlight();
     document.getElementById(z.priceId)?.classList.add("is-lit");
-    if (opts.scrollPrices !== false) scrollPriceTo(z.priceId);
+    // Desktop sticky list: scroll row into view. Mobile uses pick panel instead.
+    const desktopPrices = root.querySelector<HTMLElement>("[data-sig-prices]");
+    const showDesktopList =
+      desktopPrices && window.getComputedStyle(desktopPrices).display !== "none";
+    if (showDesktopList && opts.scrollPrices !== false) scrollPriceTo(z.priceId);
+    else if (!showDesktopList && pickCard && !pickCard.hidden) {
+      pick?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "nearest" });
+    }
   };
 
   const activateFromPrice = (priceId: string) => {
@@ -196,7 +237,10 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     clearPriceHighlight();
     document.getElementById(priceId)?.classList.add("is-lit");
     if (zoneId) setActive(zoneId);
-    else setActive(null);
+    else {
+      setActive(null);
+      document.getElementById(priceId)?.classList.add("is-lit");
+    }
   };
 
   const uvwToLocal = (uvw: [number, number, number], THREE: ThreeMod) => {
