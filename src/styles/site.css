@@ -7,6 +7,8 @@
   --soft: #c8c6c0;
   --red: #c8102e;
   --red-deep: #9a0c23;
+  --gold: #c9a24a;
+  --gold-bright: #e4c06a;
   --line: rgba(244, 241, 234, 0.12);
   --line-strong: rgba(244, 241, 234, 0.22);
   --focus: #f4f1ea;
@@ -43,13 +45,22 @@ html {
     animation: none !important;
   }
 
-  .signature__canvas {
-    opacity: 1 !important;
-    transition: none !important;
+  .signature__stroke-draw,
+  .signature__line {
+    animation: none !important;
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
   }
 
   .signature__dot-ring {
     animation: none !important;
+  }
+
+  .signature__hot,
+  .signature__label,
+  .signature__car {
+    opacity: 1 !important;
+    transition: none !important;
   }
 }
 
@@ -619,70 +630,182 @@ a:hover {
   max-width: 36rem;
 }
 
-/* —— Signature Viewer —— */
+/* —— Signature Viewer (wireframe + gold callouts) —— */
 .signature {
-  padding: 4rem 0 2.5rem;
+  padding: 3.5rem 0 2.5rem;
   border-top: 1px solid var(--line);
   overflow: clip;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 35%, rgba(201, 162, 74, 0.06), transparent 65%),
+    var(--ink);
 }
 
-.signature__wrap {
+.signature__head {
   width: var(--wrap);
-  margin-inline: auto;
-  display: grid;
-  gap: 1.5rem;
-  align-items: start;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.25rem 2rem;
 }
 
-@media (min-width: 960px) {
-  .signature__wrap {
-    grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.85fr);
-    gap: 2rem;
-    align-items: start;
+.signature__head-copy {
+  max-width: 36rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.signature__kicker {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mute);
+  font-weight: 700;
+}
+
+.signature__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5.5vw, 3.4rem);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 0.95;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2em 0.35em;
+}
+
+.signature__title-light {
+  color: var(--snow);
+}
+
+.signature__title-gold {
+  color: var(--gold);
+}
+
+.signature__lead {
+  margin: 0;
+  color: var(--mute);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 32rem;
+}
+
+.signature__badge {
+  margin: 0.35rem 0 0;
+  padding: 0.55rem 1.15rem;
+  border: 1px solid rgba(201, 162, 74, 0.55);
+  border-radius: 999px;
+  color: var(--gold-bright);
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  background: rgba(201, 162, 74, 0.06);
+}
+
+.signature__diagram {
+  width: var(--wrap);
+  margin: 0 auto;
+}
+
+.signature__art-wrap {
+  position: relative;
+  isolation: isolate;
+  min-height: clamp(320px, 58vw, 560px);
+  background:
+    radial-gradient(ellipse 55% 40% at 50% 70%, rgba(201, 162, 74, 0.07), transparent 70%),
+    #050505;
+  border: 1px solid rgba(244, 241, 234, 0.08);
+  overflow: hidden;
+}
+
+.signature__car {
+  position: absolute;
+  left: 50%;
+  top: 54%;
+  width: min(92%, 820px);
+  height: auto;
+  transform: translate(-50%, -50%);
+  color: rgba(244, 241, 234, 0.88);
+  pointer-events: none;
+  opacity: 0.92;
+  transition: opacity 0.4s var(--ease);
+}
+
+.signature.is-focused .signature__car {
+  opacity: 0.55;
+}
+
+.signature__stroke-draw.is-drawing {
+  animation: sig-stroke-draw 1.15s var(--ease) forwards;
+}
+
+@keyframes sig-stroke-draw {
+  to {
+    stroke-dashoffset: 0;
   }
 }
 
-.signature__stage {
-  position: relative;
-  isolation: isolate;
-  background:
-    radial-gradient(ellipse 70% 45% at 50% 78%, rgba(200, 16, 46, 0.1), transparent 70%),
-    linear-gradient(180deg, #121218 0%, #0b0b0c 100%);
-  border: 1px solid var(--line);
-  padding: clamp(1rem, 3vw, 1.75rem) clamp(0.5rem, 2vw, 1rem) 2.25rem;
-  min-height: clamp(260px, 42vw, 380px);
-  aspect-ratio: 16 / 9;
-}
-
-.signature__canvas {
+.signature__callouts {
   position: absolute;
   inset: 0;
-  display: block;
   width: 100%;
   height: 100%;
-  opacity: 0;
-  transition: opacity 0.7s var(--ease);
+  overflow: visible;
+  pointer-events: none;
+  z-index: 1;
 }
 
-.signature.is-ready .signature__canvas {
+.signature__line {
+  stroke: var(--gold);
+  stroke-width: 1.25;
+  opacity: 0.55;
+  filter: drop-shadow(0 0 3px rgba(201, 162, 74, 0.35));
+  transition:
+    opacity 0.3s var(--ease),
+    stroke 0.3s var(--ease),
+    filter 0.3s var(--ease);
+}
+
+.signature__line.is-drawing {
+  animation: sig-stroke-draw 0.75s var(--ease) forwards;
+}
+
+.signature__line.is-dim {
+  opacity: 0.18;
+  filter: none;
+}
+
+.signature__line.is-active {
   opacity: 1;
+  stroke: var(--gold-bright);
+  filter: drop-shadow(0 0 6px rgba(228, 192, 106, 0.75));
 }
 
-.signature__hotspots {
+.signature__hotspots,
+.signature__labels {
   list-style: none;
   margin: 0;
   padding: 0;
   position: absolute;
   inset: 0;
   pointer-events: none;
+  z-index: 2;
+}
+
+.signature__labels {
+  z-index: 1;
 }
 
 .signature__hot {
   position: absolute;
-  left: var(--hx);
-  top: var(--hy);
-  transform: translate(-50%, -50%);
-  pointer-events: auto;
+  width: 0;
+  height: 0;
+  pointer-events: none;
   opacity: 0;
   transition: opacity 0.45s var(--ease);
 }
@@ -691,8 +814,19 @@ a:hover {
   opacity: 1;
 }
 
+.signature__hot.is-dim {
+  opacity: 0.35;
+}
+
+.signature__hot.is-active {
+  opacity: 1;
+  z-index: 3;
+}
+
 .signature__dot {
-  position: relative;
+  position: absolute;
+  left: 0;
+  top: 0;
   z-index: 2;
   width: 44px;
   height: 44px;
@@ -704,25 +838,29 @@ a:hover {
   display: grid;
   place-items: center;
   border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
 }
 
-.signature__dot::before {
-  content: "";
-  width: 11px;
-  height: 11px;
+.signature__dot-core {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: var(--red);
-  box-shadow: 0 0 0 2px rgba(11, 11, 12, 0.85);
+  background: var(--gold);
+  box-shadow:
+    0 0 0 2px rgba(5, 5, 5, 0.9),
+    0 0 10px rgba(201, 162, 74, 0.85);
   transition:
     transform 0.25s var(--ease),
-    background 0.25s var(--ease);
+    background 0.25s var(--ease),
+    box-shadow 0.25s var(--ease);
 }
 
 .signature__dot-ring {
   position: absolute;
   inset: 10px;
   border-radius: 50%;
-  border: 1px solid rgba(200, 16, 46, 0.55);
+  border: 1px solid rgba(201, 162, 74, 0.55);
   animation: sig-pulse 2.2s ease-out infinite;
 }
 
@@ -730,15 +868,18 @@ a:hover {
   animation: none;
 }
 
-.signature__dot:hover::before,
-.signature__dot.is-active::before,
-.signature__hot.is-active .signature__dot::before {
-  transform: scale(1.2);
-  background: #e01838;
+.signature__dot:hover .signature__dot-core,
+.signature__dot.is-active .signature__dot-core,
+.signature__hot.is-active .signature__dot-core {
+  transform: scale(1.25);
+  background: var(--gold-bright);
+  box-shadow:
+    0 0 0 2px rgba(5, 5, 5, 0.9),
+    0 0 16px rgba(228, 192, 106, 1);
 }
 
 .signature__dot:focus-visible {
-  outline: 2px solid var(--focus);
+  outline: 2px solid var(--gold-bright);
   outline-offset: 2px;
 }
 
@@ -753,80 +894,102 @@ a:hover {
   }
 }
 
-.signature__chip {
+.signature__label {
   position: absolute;
-  left: 50%;
-  white-space: nowrap;
+  transform: translate(-50%, -50%);
   display: grid;
-  gap: 0.1rem;
-  padding: 0.35rem 0.65rem;
-  background: rgba(19, 19, 22, 0.92);
-  border: 1px solid var(--line-strong);
+  gap: 0.12rem;
+  min-width: 7.5rem;
+  max-width: 11rem;
   pointer-events: none;
   opacity: 0;
-  transform: translate(-50%, 0);
   transition:
-    opacity 0.25s var(--ease),
-    transform 0.25s var(--ease);
+    opacity 0.45s var(--ease),
+    filter 0.3s var(--ease);
 }
 
-.signature__hot--top .signature__chip {
-  bottom: calc(100% + 0.35rem);
-  transform: translate(-50%, 6px);
-}
-
-.signature__hot--bottom .signature__chip {
-  top: calc(100% + 0.35rem);
-  transform: translate(-50%, -6px);
-}
-
-.signature__hot:hover .signature__chip,
-.signature__hot.is-active .signature__chip,
-.signature__dot:focus-visible + .signature__chip {
+.signature.is-ready .signature__label {
   opacity: 1;
+}
+
+.signature__label--left {
+  text-align: left;
+  transform: translate(0, -50%);
+}
+
+.signature__label--right {
+  text-align: right;
+  transform: translate(-100%, -50%);
+}
+
+.signature__label--top {
+  text-align: center;
+  transform: translate(-50%, -100%);
+}
+
+.signature__label--bottom {
+  text-align: center;
   transform: translate(-50%, 0);
 }
 
-.signature__chip-label {
-  font-size: 0.68rem;
-  letter-spacing: 0.14em;
+.signature__label-title {
+  font-size: clamp(0.62rem, 1.4vw, 0.78rem);
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--mute);
+  color: var(--gold);
   font-weight: 700;
+  line-height: 1.2;
+  transition: color 0.25s var(--ease);
 }
 
-.signature__chip-price {
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  letter-spacing: 0.03em;
+.signature__label-sub {
+  font-size: clamp(0.68rem, 1.3vw, 0.82rem);
+  color: rgba(244, 241, 234, 0.72);
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.signature__label-price {
+  font-size: clamp(0.7rem, 1.3vw, 0.85rem);
+  color: var(--snow);
+  font-weight: 600;
+  margin-top: 0.1rem;
+}
+
+.signature__label.is-dim {
+  opacity: 0.28;
+  filter: grayscale(0.35);
+}
+
+.signature__label.is-active {
+  opacity: 1;
+  z-index: 3;
+}
+
+.signature__label.is-active .signature__label-title {
+  color: var(--gold-bright);
+  text-shadow: 0 0 12px rgba(228, 192, 106, 0.45);
+}
+
+.signature__label.is-active .signature__label-sub,
+.signature__label.is-active .signature__label-price {
   color: var(--snow);
 }
 
-/* Side price panel */
+/* Price list under diagram */
 .signature__prices {
-  border-top: 2px solid var(--red);
-  padding: 1.1rem 0 0;
+  width: var(--wrap);
+  margin: 2rem auto 0;
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
-  min-height: 0;
-}
-
-@media (min-width: 960px) {
-  .signature__prices {
-    position: sticky;
-    top: 5.5rem;
-    border-top: 0;
-    border-left: 2px solid var(--red);
-    padding: 0.15rem 0 0.25rem 1.25rem;
-    max-height: calc(100vh - 6.5rem);
-  }
+  border-top: 2px solid var(--gold);
+  padding-top: 1.25rem;
 }
 
 .signature__prices-head {
   display: grid;
   gap: 0.35rem;
-  flex-shrink: 0;
 }
 
 .signature__panel-kicker {
@@ -834,7 +997,7 @@ a:hover {
   font-size: 0.72rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--red);
+  color: var(--gold);
   font-weight: 700;
 }
 
@@ -861,24 +1024,13 @@ a:hover {
   margin: 0;
   padding: 0;
   border-top: 1px solid var(--line);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(200, 16, 46, 0.45) transparent;
+  display: grid;
+  grid-template-columns: 1fr;
 }
 
-@media (min-width: 960px) {
+@media (min-width: 720px) {
   .signature__price-list {
-    flex: 1 1 auto;
-    min-height: 0;
-    max-height: none;
-  }
-}
-
-@media (max-width: 959px) {
-  .signature__price-list {
-    max-height: min(52vh, 420px);
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -886,8 +1038,20 @@ a:hover {
   width: 100%;
 }
 
+.signature__price-list .price-list__sum {
+  color: var(--gold);
+}
+
+.signature__price-list .price-list__row.is-lit {
+  background: linear-gradient(90deg, rgba(201, 162, 74, 0.16), transparent 75%);
+  box-shadow: inset 3px 0 0 var(--gold);
+}
+
+.signature__price-list .price-list__row:hover {
+  background: linear-gradient(90deg, rgba(201, 162, 74, 0.08), transparent 70%);
+}
+
 .signature__prices-cta {
-  flex-shrink: 0;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -901,7 +1065,7 @@ a:hover {
   margin: 0;
   color: var(--mute);
   font-size: 0.86rem;
-  max-width: 16rem;
+  max-width: 22rem;
 }
 
 .signature__note {
@@ -913,28 +1077,26 @@ a:hover {
   max-width: 48rem;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .signature__canvas {
-    opacity: 1 !important;
-    transition: none !important;
-  }
-
-  .signature__hot {
-    opacity: 1 !important;
-  }
-
-  .signature__dot-ring {
-    animation: none !important;
-  }
-}
-
 @media (max-width: 700px) {
-  .signature__chip {
+  .signature__art-wrap {
+    min-height: clamp(380px, 110vw, 520px);
+  }
+
+  .signature__car {
+    width: 108%;
+    top: 48%;
+  }
+
+  .signature__label-price {
     display: none;
   }
 
-  .signature__stage {
-    padding-bottom: 1.5rem;
+  .signature__label {
+    max-width: 7.2rem;
+  }
+
+  .signature__label-title {
+    letter-spacing: 0.06em;
   }
 }
 

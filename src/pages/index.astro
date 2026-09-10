@@ -460,7 +460,7 @@ const jsonLd = {
 
       if (!reduceMotion && "IntersectionObserver" in window) {
         const targets = document.querySelectorAll(
-          ".section-head, .services__list li, .price-list__row, .shot, .process__list li, .reviews__grid li, .signature__wrap",
+          ".section-head, .services__list li, .price-list__row, .shot, .process__list li, .reviews__grid li, .signature__head, .signature__diagram",
         );
         const io = new IntersectionObserver(
           (entries) => {

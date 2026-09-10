@@ -1,4 +1,6 @@
 ---
+import SignatureCarArt from "./SignatureCarArt.astro";
+
 interface PriceRow {
   id: string;
   title: string;
@@ -11,96 +13,92 @@ interface Props {
 }
 
 const { prices, waHref } = Astro.props;
-const modelUrl = `${import.meta.env.BASE_URL}models/car.glb`;
 
+/** Real Hollywood services — titles + short subtitles for callouts */
 const zones = [
   {
     id: "optics",
-    label: "Оптика",
-    title: "Bi-LED линзы и полировка фар",
+    title: "Bi-LED линзы",
+    subtitle: "полировка фар от 3 500 ₽",
     price: "от 12 000 ₽",
-    detail: "Bi-LED от 12 000 ₽ · полировка фар от 3 500 ₽",
     priceIds: ["price-biled", "price-headlights"],
-    x: 10.5,
-    y: 54,
-    side: "top" as const,
+    ax: 28.5,
+    ay: 58,
+    lx: 6,
+    ly: 72,
+    side: "left" as const,
   },
   {
     id: "ppf",
-    label: "Защита",
-    title: "Оклейка бронеплёнкой",
+    title: "Бронеплёнка",
+    subtitle: "защита от сколов",
     price: "от 12 000 ₽",
-    detail: "Капот, бампер, крылья, зоны риска сколов",
     priceIds: ["price-ppf"],
-    x: 22,
-    y: 38,
-    side: "top" as const,
+    ax: 42,
+    ay: 42,
+    lx: 8,
+    ly: 18,
+    side: "left" as const,
   },
   {
     id: "paint",
-    label: "Кузов",
     title: "Полировка кузова",
+    subtitle: "глубокий блеск ЛКП",
     price: "от 14 000 ₽",
-    detail: "Лёгкая и глубокая — глубина цвета и блеск ЛКП",
     priceIds: ["price-polish"],
-    x: 44,
-    y: 28,
-    side: "top" as const,
-  },
-  {
-    id: "ceramic",
-    label: "Керамика",
-    title: "Керамика и жидкое стекло",
-    price: "от 18 900 ₽",
-    detail: "Керамика от 18 900 ₽ · жидкое стекло от 5 000 ₽",
-    priceIds: ["price-ceramic", "price-glasscoat"],
-    x: 64,
-    y: 30,
+    ax: 54,
+    ay: 30,
+    lx: 38,
+    ly: 6,
     side: "top" as const,
   },
   {
     id: "interior",
-    label: "Салон",
     title: "Химчистка салона",
+    subtitle: "чистота внутри",
     price: "уточняйте",
-    detail: "Глубокая чистка — объём после осмотра",
     priceIds: ["price-interior"],
-    x: 48,
-    y: 46,
-    side: "bottom" as const,
+    ax: 62,
+    ay: 48,
+    lx: 78,
+    ly: 8,
+    side: "right" as const,
   },
   {
-    id: "sound",
-    label: "Звук",
-    title: "Автозвук / магнитола",
+    id: "ceramic",
+    title: "Керамика",
+    subtitle: "жидкое стекло от 5 000 ₽",
+    price: "от 18 900 ₽",
+    priceIds: ["price-ceramic", "price-glasscoat"],
+    ax: 78,
+    ay: 46,
+    lx: 92,
+    ly: 28,
+    side: "right" as const,
+  },
+  {
+    id: "audio",
+    title: "Автозвук",
+    subtitle: "магнитола и акустика",
     price: "от 6 000 ₽",
-    detail: "От замены магнитолы до соревновательного уровня",
     priceIds: ["price-audio"],
-    x: 36,
-    y: 54,
+    ax: 56,
+    ay: 68,
+    lx: 48,
+    ly: 92,
     side: "bottom" as const,
   },
   {
-    id: "noise",
-    label: "Шумоизоляция",
-    title: "Шумоизоляция",
-    price: "от 6 000 ₽",
-    detail: "Двери, пол, арки — тише в салоне",
-    priceIds: ["price-noise"],
-    x: 70,
-    y: 54,
-    side: "bottom" as const,
-  },
-  {
-    id: "rear",
-    label: "Антикор",
+    id: "anticor",
     title: "Антикор",
+    subtitle: "днище и полости",
     price: "от 20 000 ₽",
-    detail: "Обработка днища и скрытых полостей",
     priceIds: ["price-anticor"],
-    x: 90,
-    y: 64,
-    side: "bottom" as const,
+    ax: 82,
+    ay: 72,
+    lx: 94,
+    ly: 78,
+    side: "right" as const,
   },
 ];
 
@@ -108,94 +106,139 @@ const zoneByPrice: Record<string, string> = {};
 for (const z of zones) {
   for (const pid of z.priceIds) zoneByPrice[pid] = z.id;
 }
+
+/** Lowest starting price from the live list (полировка фар) */
+const fromPrice = "от 3 500 ₽";
+
+function elbowPath(ax: number, ay: number, lx: number, ly: number, side: string): string {
+  const mx =
+    side === "left" ? Math.min(ax, lx) + Math.abs(ax - lx) * 0.35 : Math.max(ax, lx) - Math.abs(ax - lx) * 0.35;
+  const my = side === "top" ? Math.min(ay, ly) + 4 : side === "bottom" ? Math.max(ay, ly) - 4 : (ay + ly) / 2;
+  if (side === "top" || side === "bottom") {
+    return `M ${ax} ${ay} L ${ax} ${my} L ${lx} ${my} L ${lx} ${ly}`;
+  }
+  return `M ${ax} ${ay} L ${mx} ${ay} L ${mx} ${ly} L ${lx} ${ly}`;
+}
 ---
 
-<section
-  class="signature"
-  id="signature"
-  aria-labelledby="signature-title"
-  data-signature
-  data-model-url={modelUrl}
->
-  <div class="section-head">
-    <p class="kicker">Зоны авто</p>
-    <h2 id="signature-title">Что можно сделать с авто</h2>
-    <p>
-      Наведите на зону кузова — прайс справа подсветит и прокрутит нужную строку. 3D-модель
-      спортивного седана в студийном свете.
+<section class="signature" id="signature" aria-labelledby="signature-title" data-signature>
+  <div class="signature__head">
+    <div class="signature__head-copy">
+      <p class="signature__kicker">Услуги</p>
+      <h2 id="signature-title" class="signature__title">
+        <span class="signature__title-light">Детейлинг</span>
+        <span class="signature__title-gold">полный уход</span>
+      </h2>
+      <p class="signature__lead">
+        Нажмите на зону кузова — подсветятся линия, подпись и строки прайса. Реальные услуги и цены
+        студии HOLLYWOOD.
+      </p>
+    </div>
+    <p class="signature__badge" aria-label={`Цены стартуют ${fromPrice}`}>
+      <span>{fromPrice}</span>
     </p>
   </div>
 
-  <div class="signature__wrap">
-    <div class="signature__stage" data-sig-stage>
-      <canvas
-        class="signature__canvas"
-        data-sig-canvas
-        aria-label="3D-модель спортивного седана — зоны услуг детейлинга"
-      ></canvas>
+  <div class="signature__diagram" data-sig-stage>
+    <div class="signature__art-wrap">
+      <SignatureCarArt />
+
+      <svg
+        class="signature__callouts"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+        focusable="false"
+      >
+        {
+          zones.map((z) => (
+            <path
+              class="signature__line"
+              data-sig-line={z.id}
+              d={elbowPath(z.ax, z.ay, z.lx, z.ly, z.side)}
+              fill="none"
+              vector-effect="non-scaling-stroke"
+            />
+          ))
+        }
+      </svg>
 
       <ul class="signature__hotspots" data-sig-hotspots>
         {
           zones.map((z) => (
-            <li class={`signature__hot signature__hot--${z.side}`} style={`--hx:${z.x}%; --hy:${z.y}%;`}>
+            <li
+              class="signature__hot"
+              style={`left: ${z.ax}%; top: ${z.ay}%;`}
+              data-sig-hot-wrap={z.id}
+            >
               <button
                 type="button"
                 class="signature__dot"
                 data-sig-hot={z.id}
                 data-price-ids={z.priceIds.join(",")}
-                aria-label={`${z.title}, ${z.price}`}
+                aria-label={`${z.title}, ${z.price}. ${z.subtitle}`}
                 aria-controls="prices"
-                aria-expanded="false"
+                aria-pressed="false"
               >
+                <span class="signature__dot-core" aria-hidden="true" />
                 <span class="signature__dot-ring" aria-hidden="true" />
-                <span class="sr-only">{z.label}</span>
               </button>
-              <span class="signature__chip" aria-hidden="true">
-                <span class="signature__chip-label">{z.label}</span>
-                <span class="signature__chip-price">{z.price}</span>
-              </span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <ul class="signature__labels" aria-hidden="true">
+        {
+          zones.map((z) => (
+            <li
+              class={`signature__label signature__label--${z.side}`}
+              style={`left: ${z.lx}%; top: ${z.ly}%;`}
+              data-sig-label={z.id}
+            >
+              <span class="signature__label-title">{z.title}</span>
+              <span class="signature__label-sub">{z.subtitle}</span>
+              <span class="signature__label-price">{z.price}</span>
             </li>
           ))
         }
       </ul>
     </div>
-
-    <aside class="signature__prices" id="prices" data-sig-prices aria-label="Прайс услуг">
-      <div class="signature__prices-head">
-        <p class="signature__panel-kicker">Прайс</p>
-        <h3 class="signature__prices-title">Цены</h3>
-        <p class="signature__prices-lead">
-          Стартовые цены с Яндекс Карт. Наведите зону на авто — строка подсветится.
-        </p>
-      </div>
-      <ul class="signature__price-list" data-sig-price-list>
-        {
-          prices.map((row) => (
-            <li
-              class="price-list__row"
-              id={row.id}
-              data-sig-price-row={row.id}
-              data-zone={zoneByPrice[row.id] ?? ""}
-              tabindex="0"
-            >
-              <span class="price-list__name">{row.title}</span>
-              <span class="price-list__sum">{row.price}</span>
-            </li>
-          ))
-        }
-      </ul>
-      <div class="signature__prices-cta">
-        <p>Нужна другая услуга — напишите, подскажем по авто.</p>
-        <a class="btn btn--solid" href={waHref} target="_blank" rel="noopener noreferrer"
-          >Уточнить в WhatsApp</a
-        >
-      </div>
-    </aside>
   </div>
 
-  <p class="signature__note">
-    3D-модель: Kenney Car Kit «sedan-sports» (CC0). Цены — из карточки на Яндекс Картах.
-  </p>
+  <div class="signature__prices" id="prices" data-sig-prices>
+    <div class="signature__prices-head">
+      <p class="signature__panel-kicker">Прайс</p>
+      <h3 class="signature__prices-title">Цены</h3>
+      <p class="signature__prices-lead">
+        Стартовые цены с Яндекс Карт. Выберите зону на схеме — строки подсветятся.
+      </p>
+    </div>
+    <ul class="signature__price-list" data-sig-price-list>
+      {
+        prices.map((row) => (
+          <li
+            class="price-list__row"
+            id={row.id}
+            data-sig-price-row={row.id}
+            data-zone={zoneByPrice[row.id] ?? ""}
+            tabindex="0"
+          >
+            <span class="price-list__name">{row.title}</span>
+            <span class="price-list__sum">{row.price}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="signature__prices-cta">
+      <p>Нужна другая услуга — напишите, подскажем по авто.</p>
+      <a class="btn btn--solid" href={waHref} target="_blank" rel="noopener noreferrer"
+        >Уточнить в WhatsApp</a
+      >
+    </div>
+  </div>
+
+  <p class="signature__note">Цены — из карточки на Яндекс Картах. Итоговая сумма после осмотра авто.</p>
 </section>
 
 <script>
