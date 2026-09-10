@@ -23,10 +23,10 @@ Astro (static) + TypeScript + авторский CSS. Деплой через Gi
 
 Секция «Детейлинг — полный уход» (`#signature`):
 
-- **3D wireframe:** Khronos **CarConcept** GLB (`public/models/car-concept.glb`) — тёмный studio + EdgesGeometry, не «пластиковая» игрушка.
-- **Золотые callout-линии:** точки на зонах кузова (проекция 3D→2D) → подписи; hover/click подсвечивает линию и лейбл.
-- **Прайс** (`#prices`): одна услуга — одна строка; hotspot ↔ одна строка.
-- Lazy-load Three.js при появлении секции, dispose вне viewport, DPR cap на мобиле, `prefers-reduced-motion` без орбиты.
+- **3D wireframe (static):** Khronos **CarConcept** GLB — тёмный studio + EdgesGeometry, камера фиксирована в ¾ ракурсе (без орбиты / fly-to).
+- **Золотые callout-точки:** якоря в нормированном AABB кузова (`uvw`), проекция 3D→2D; hover/click подсвечивает линию и лейбл.
+- **Прайс** (`#prices`): каждая услуга — своя точка и своя строка (1:1).
+- Lazy-load Three.js при появлении секции, dispose вне viewport, DPR cap на мобиле.
 - Источник и лицензия: [`docs/signature-3d-model.md`](docs/signature-3d-model.md).
 
 **Не используется** модель Audi e-tron GT с Sketchfab (CC BY-NC-SA — коммерческий сайт запрещён; плюс Real Racing 3). Подробности в том же документе.

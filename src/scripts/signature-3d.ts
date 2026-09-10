@@ -6,6 +6,7 @@ import type {
   Object3D,
   Mesh,
   LineSegments,
+  Vector3,
 } from "three";
 
 export type SigZone3D = {
@@ -14,10 +15,13 @@ export type SigZone3D = {
   subtitle: string;
   price: string;
   priceId: string;
-  /** Local-space anchor on the car (after fit) */
-  point: [number, number, number];
+  /**
+   * Normalized position inside the fitted car AABB (0..1 each axis).
+   * x: 0 left → 1 right, y: 0 bottom → 1 top, z: 0 rear → 1 front
+   * (in model local space BEFORE yaw; yaw is applied on the car root)
+   */
+  uvw: [number, number, number];
   side: "left" | "right" | "top" | "bottom";
-  /** Label screen bias in % of stage (away from car) */
   labelBias: [number, number];
 };
 
@@ -61,11 +65,12 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
   let camera: PerspectiveCamera | null = null;
   let carRoot: Group | null = null;
   let edgeGroup: Group | null = null;
-  let raf = 0;
+  let markerRoot: Group | null = null;
   let alive = false;
   let disposed = false;
   let ready = false;
-  let t0 = 0;
+  let boxSize: Vector3 | null = null;
+  let boxMin: Vector3 | null = null;
 
   const zoneByPrice: Record<string, string> = {};
   for (const z of zones) zoneByPrice[z.priceId] = z.id;
@@ -162,16 +167,32 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     else setActive(null);
   };
 
+  /** Map normalized uvw → carRoot-local point using fitted AABB (snaps to body, not float-high guesses). */
+  const uvwToLocal = (uvw: [number, number, number], THREE: ThreeMod) => {
+    if (!boxMin || !boxSize) return new THREE.Vector3();
+    const [u, v, w] = uvw;
+    return new THREE.Vector3(
+      boxMin.x + boxSize.x * clamp(u),
+      boxMin.y + boxSize.y * clamp(v),
+      boxMin.z + boxSize.z * clamp(w),
+    );
+  };
+
   const projectZone = (z: SigZone3D, THREE: ThreeMod) => {
     if (!camera || !carRoot || !renderer) return null;
-    const v = new THREE.Vector3(z.point[0], z.point[1], z.point[2]);
-    carRoot.localToWorld(v);
+    // Prefer live marker Object3D if present (follows car transform exactly)
+    const marker = markerRoot?.getObjectByName(`sig-mark-${z.id}`);
+    const v = marker
+      ? new THREE.Vector3().setFromMatrixPosition(marker.matrixWorld)
+      : (() => {
+          const p = uvwToLocal(z.uvw, THREE);
+          carRoot!.localToWorld(p);
+          return p;
+        })();
     v.project(camera);
-    const rect = canvasHost.getBoundingClientRect();
-    if (rect.width < 1 || rect.height < 1) return null;
+    if (v.z > 1) return null;
     const ax = ((v.x + 1) / 2) * 100;
     const ay = ((1 - v.y) / 2) * 100;
-    if (v.z > 1) return null;
     const lx = clamp(ax + z.labelBias[0], 2, 98);
     const ly = clamp(ay + z.labelBias[1], 3, 96);
     return { ax, ay, lx, ly, side: z.side };
@@ -205,9 +226,10 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     const center = box.getCenter(new THREE.Vector3());
     object.position.sub(center);
     const maxDim = Math.max(size.x, size.y, size.z) || 1;
-    const scale = 2.35 / maxDim;
+    const scale = 2.45 / maxDim;
     object.scale.setScalar(scale);
-    object.rotation.y = Math.PI * 0.18;
+    // Stronger ¾ yaw so the nose faces the viewer clearly
+    object.rotation.y = Math.PI * 0.32;
     object.updateMatrixWorld(true);
   };
 
@@ -236,7 +258,6 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
       const edges = new THREE.EdgesGeometry(mesh.geometry, 22);
       const lines = new THREE.LineSegments(edges, lineMat);
       linesRoot.add(lines);
-      // Bake mesh world matrix relative to source root
       mesh.updateWorldMatrix(true, false);
       const m = mesh.matrixWorld.clone();
       const inv = source.matrixWorld.clone().invert();
@@ -245,6 +266,12 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
       lines.matrixAutoUpdate = false;
     });
     return linesRoot;
+  };
+
+  const paint = () => {
+    if (!renderer || !scene || !camera) return;
+    renderer.render(scene, camera);
+    syncOverlays();
   };
 
   const resize = () => {
@@ -256,32 +283,11 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
-    syncOverlays();
-  };
-
-  const animate = (now: number) => {
-    if (!alive || !renderer || !scene || !camera || !carRoot) return;
-    raf = requestAnimationFrame(animate);
-    if (!t0) t0 = now;
-    const t = (now - t0) / 1000;
-
-    if (!reduceMotion) {
-      // Front (headlights) → rear orbit, gentle
-      const a = 0.55 + Math.sin(t * 0.22) * 0.55;
-      const elev = 0.42 + Math.sin(t * 0.15) * 0.06;
-      const dist = 4.15;
-      camera.position.set(Math.sin(a) * dist, elev + 0.55, Math.cos(a) * dist);
-      camera.lookAt(0, 0.05, 0);
-    }
-
-    renderer.render(scene, camera);
-    syncOverlays();
+    paint();
   };
 
   const disposeScene = () => {
     alive = false;
-    cancelAnimationFrame(raf);
-    raf = 0;
     if (renderer) {
       renderer.dispose();
       renderer.forceContextLoss?.();
@@ -294,6 +300,9 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     camera = null;
     carRoot = null;
     edgeGroup = null;
+    markerRoot = null;
+    boxSize = null;
+    boxMin = null;
     THREE = null;
   };
 
@@ -308,12 +317,13 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
 
     const scn = new three.Scene();
     scn.background = new three.Color(0x050506);
-    scn.fog = new three.Fog(0x050506, 6.5, 14);
+    scn.fog = new three.Fog(0x050506, 7, 16);
     scene = scn;
 
-    const cam = new three.PerspectiveCamera(32, 1, 0.1, 40);
-    cam.position.set(0.35, 0.95, 4.2);
-    cam.lookAt(0, 0.05, 0);
+    // Fixed ¾ front camera — no orbit, no fly-to
+    const cam = new three.PerspectiveCamera(34, 1, 0.1, 40);
+    cam.position.set(2.55, 1.05, 3.55);
+    cam.lookAt(0, 0.02, 0);
     camera = cam;
 
     const rend = new three.WebGLRenderer({
@@ -341,7 +351,7 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
       new three.MeshBasicMaterial({ color: 0x0a0a0c, transparent: true, opacity: 0.9 }),
     );
     floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -0.72;
+    floor.position.y = -0.78;
     scn.add(floor);
 
     const loader = new GLTFLoader();
@@ -359,7 +369,42 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     carRoot = rootGroup;
     edgeGroup = edges;
 
-    // Seed hotspots / labels / lines once
+    // Measure AABB in car-aligned axes (yaw temporarily zeroed), then restore ¾ pose.
+    // Markers live in model-local space so they rotate with the car.
+    const savedYaw = model.rotation.y;
+    model.rotation.y = 0;
+    model.updateMatrixWorld(true);
+    const aligned = new three.Box3().setFromObject(model);
+    const invModel = model.matrixWorld.clone().invert();
+    const localMin = aligned.min.clone().applyMatrix4(invModel);
+    const localMax = aligned.max.clone().applyMatrix4(invModel);
+    boxMin = new three.Vector3(
+      Math.min(localMin.x, localMax.x),
+      Math.min(localMin.y, localMax.y),
+      Math.min(localMin.z, localMax.z),
+    );
+    boxSize = new three.Vector3(
+      Math.abs(localMax.x - localMin.x),
+      Math.abs(localMax.y - localMin.y),
+      Math.abs(localMax.z - localMin.z),
+    );
+    model.rotation.y = savedYaw;
+    model.updateMatrixWorld(true);
+
+    markerRoot = new three.Group();
+    model.add(markerRoot);
+    for (const z of zones) {
+      const mark = new three.Object3D();
+      mark.name = `sig-mark-${z.id}`;
+      // uvw → model-local (car axes): u left→right, v bottom→top, w rear→front
+      mark.position.set(
+        boxMin.x + boxSize.x * clamp(z.uvw[0]),
+        boxMin.y + boxSize.y * clamp(z.uvw[1]),
+        boxMin.z + boxSize.z * clamp(z.uvw[2]),
+      );
+      markerRoot.add(mark);
+    }
+
     calloutsSvg.innerHTML = "";
     hotspotsUl.innerHTML = "";
     labelsUl.innerHTML = "";
@@ -403,21 +448,19 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     alive = true;
     resize();
     markReady();
-    // Draw lines in
     root.querySelectorAll<SVGPathElement>("[data-sig-line]").forEach((line, i) => {
       try {
         const len = Math.max(line.getTotalLength(), 1);
         line.style.setProperty("--sig-len", String(len));
         line.style.strokeDasharray = String(len);
         line.style.strokeDashoffset = String(len);
-        line.style.animationDelay = `${0.05 + i * 0.05}s`;
+        line.style.animationDelay = `${0.04 + i * 0.04}s`;
         line.classList.add("is-drawing");
       } catch {
         /* skip */
       }
     });
-    syncOverlays();
-    raf = requestAnimationFrame(animate);
+    paint();
   };
 
   priceRows.forEach((row) => {
