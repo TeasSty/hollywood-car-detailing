@@ -1,0 +1,535 @@
+---
+/**
+ * Interactive side-profile Signature Viewer.
+ * Original SVG illustration inspired by BMW M5 Competition proportions
+ * (no brand marks). Author-owned artwork for this site.
+ */
+
+const zones = [
+  {
+    id: "optics",
+    label: "Оптика",
+    title: "Bi-LED линзы и полировка фар",
+    price: "от 12 000 ₽",
+    detail: "Bi-LED от 12 000 ₽ · полировка фар от 3 500 ₽",
+    priceIds: ["price-biled", "price-headlights"],
+    x: 14.5,
+    y: 48,
+    side: "top" as const,
+  },
+  {
+    id: "ppf",
+    label: "Защита",
+    title: "Оклейка бронеплёнкой",
+    price: "от 12 000 ₽",
+    detail: "Капот, бампер, крылья, зоны риска сколов",
+    priceIds: ["price-ppf"],
+    x: 22,
+    y: 38,
+    side: "top" as const,
+  },
+  {
+    id: "paint",
+    label: "Кузов",
+    title: "Полировка кузова",
+    price: "от 14 000 ₽",
+    detail: "Лёгкая и глубокая — глубина цвета и блеск ЛКП",
+    priceIds: ["price-polish"],
+    x: 42,
+    y: 34,
+    side: "top" as const,
+  },
+  {
+    id: "ceramic",
+    label: "Керамика",
+    title: "Керамика и жидкое стекло",
+    price: "от 18 900 ₽",
+    detail: "Керамика от 18 900 ₽ · жидкое стекло от 5 000 ₽",
+    priceIds: ["price-ceramic", "price-glasscoat"],
+    x: 58,
+    y: 36,
+    side: "top" as const,
+  },
+  {
+    id: "interior",
+    label: "Салон",
+    title: "Химчистка салона",
+    price: "уточняйте",
+    detail: "Глубокая чистка — объём после осмотра",
+    priceIds: ["price-interior"],
+    x: 48,
+    y: 52,
+    side: "bottom" as const,
+  },
+  {
+    id: "sound",
+    label: "Звук",
+    title: "Автозвук / магнитола",
+    price: "от 6 000 ₽",
+    detail: "От замены магнитолы до соревновательного уровня",
+    priceIds: ["price-audio"],
+    x: 36,
+    y: 58,
+    side: "bottom" as const,
+  },
+  {
+    id: "noise",
+    label: "Шумоизоляция",
+    title: "Шумоизоляция",
+    price: "от 6 000 ₽",
+    detail: "Двери, пол, арки — тише в салоне",
+    priceIds: ["price-noise"],
+    x: 64,
+    y: 58,
+    side: "bottom" as const,
+  },
+  {
+    id: "rear",
+    label: "Антикор",
+    title: "Антикор",
+    price: "от 20 000 ₽",
+    detail: "Обработка днища и скрытых полостей",
+    priceIds: ["price-anticor"],
+    x: 86,
+    y: 62,
+    side: "bottom" as const,
+  },
+];
+---
+
+<section class="signature" id="signature" aria-labelledby="signature-title" data-signature>
+  <div class="section-head">
+    <p class="kicker">Зоны авто</p>
+    <h2 id="signature-title">Что можно сделать с авто</h2>
+    <p>
+      Нажмите на зону кузова — покажем услугу и стартовую цену из прайса. Силуэт
+      спортивного седана в духе M5 Competition: линия от фар до заднего бампера.
+    </p>
+  </div>
+
+  <div class="signature__wrap">
+    <div class="signature__stage" data-sig-stage>
+      <svg
+        class="signature__svg"
+        viewBox="0 0 1100 420"
+        role="img"
+        aria-label="Силуэт спортивного седана: линия кузова от передних фар до заднего бампера"
+        data-sig-svg
+      >
+        <defs>
+          <linearGradient id="sig-body" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2a2a30" />
+            <stop offset="38%" stop-color="#1a1a1f" />
+            <stop offset="72%" stop-color="#121216" />
+            <stop offset="100%" stop-color="#0d0d10" />
+          </linearGradient>
+          <linearGradient id="sig-shine" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#f4f1ea" stop-opacity="0.18" />
+            <stop offset="45%" stop-color="#f4f1ea" stop-opacity="0.04" />
+            <stop offset="100%" stop-color="#f4f1ea" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="sig-glass" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#8a9aaa" stop-opacity="0.35" />
+            <stop offset="100%" stop-color="#3a4450" stop-opacity="0.2" />
+          </linearGradient>
+          <linearGradient id="sig-ground" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#c8102e" stop-opacity="0.22" />
+            <stop offset="100%" stop-color="#c8102e" stop-opacity="0" />
+          </linearGradient>
+          <filter id="sig-glow" x="-20%" y="-40%" width="140%" height="180%">
+            <feGaussianBlur stdDeviation="8" result="b" />
+            <feMerge>
+              <feMergeNode in="b" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- ground wash -->
+        <ellipse class="signature__ground" cx="560" cy="368" rx="420" ry="18" fill="url(#sig-ground)" />
+
+        <!-- soft fill (reveals after stroke) -->
+        <g class="signature__fill" data-sig-fill aria-hidden="true">
+          <path
+            fill="url(#sig-body)"
+            d="M92 268
+              C118 248 148 228 178 214
+              C210 198 238 188 268 182
+              L318 168
+              C348 148 392 128 448 118
+              C510 106 575 104 640 112
+              C710 122 770 140 818 168
+              L872 198
+              C898 214 922 232 948 252
+              C968 268 982 278 996 286
+              L1008 292
+              C1018 298 1024 308 1022 320
+              C1020 332 1010 340 996 342
+              L940 348
+              C928 318 900 298 862 298
+              C824 298 796 318 784 348
+              L520 352
+              C508 322 480 302 442 302
+              C404 302 376 322 364 352
+              L210 348
+              C198 320 170 300 132 300
+              C108 300 92 312 86 332
+              C82 318 84 290 92 268 Z"
+          />
+          <path
+            fill="url(#sig-shine)"
+            d="M178 214
+              C238 188 318 168 448 118
+              C575 104 710 122 818 168
+              L872 198
+              C840 188 780 158 640 148
+              C520 138 400 152 318 178
+              C268 192 220 208 178 214 Z"
+          />
+          <path
+            fill="url(#sig-glass)"
+            d="M330 176
+              L448 128
+              C520 116 600 118 680 132
+              L790 178
+              L760 188
+              C690 168 600 158 520 162
+              L400 178
+              Z"
+          />
+        </g>
+
+        <!-- primary silhouette stroke: nose (headlights) → rear bumper -->
+        <path
+          class="signature__stroke"
+          data-sig-stroke
+          fill="none"
+          stroke="#f4f1ea"
+          stroke-width="1.75"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          pathLength="1"
+          d="M96 270
+            C122 248 152 228 182 214
+            C214 198 242 188 272 182
+            L322 168
+            C352 148 396 128 452 118
+            C514 106 578 104 642 112
+            C712 122 772 140 820 168
+            L874 198
+            C900 214 924 232 950 252
+            C970 268 984 278 998 286
+            L1010 292
+            C1020 298 1026 308 1024 320
+            C1022 332 1012 340 998 342
+            L942 348
+            C930 318 902 298 864 298
+            C826 298 798 318 786 348
+            L522 352
+            C510 322 482 302 444 302
+            C406 302 378 322 366 352
+            L212 348
+            C200 320 172 300 134 300
+            C110 300 94 312 88 332
+            C84 320 86 292 96 270"
+        />
+
+        <!-- character / detail strokes -->
+        <g class="signature__details" data-sig-details fill="none" stroke="#c8c6c0" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <!-- belt / shoulder line -->
+          <path pathLength="1" d="M190 230 C280 200 420 178 560 176 C700 174 820 196 900 230" />
+          <!-- rocker -->
+          <path pathLength="1" d="M210 338 L360 342 L520 344 L780 342 L940 338" />
+          <!-- window frames -->
+          <path pathLength="1" d="M336 178 L448 130 C520 118 600 120 678 134 L786 176 L756 186 C688 166 600 156 522 160 L404 176 Z" />
+          <path pathLength="1" d="M520 160 L520 178" />
+          <!-- Hofmeister-ish rear window kink -->
+          <path pathLength="1" d="M678 134 L720 148 L756 186" />
+          <!-- mirror -->
+          <path pathLength="1" d="M348 188 C338 178 328 176 318 180 C312 184 314 194 324 198 L348 200" />
+          <!-- front lamp block -->
+          <path pathLength="1" d="M118 252 C132 244 148 238 162 236 C168 244 166 256 158 264 C144 268 128 266 118 258 Z" />
+          <!-- grille hint -->
+          <path pathLength="1" d="M104 278 C118 268 132 262 148 260" />
+          <!-- rear lamp -->
+          <path pathLength="1" d="M968 278 C984 286 998 296 1008 308 C996 312 980 310 968 304 Z" />
+          <!-- door seams -->
+          <path pathLength="1" d="M420 186 L416 330" />
+          <path pathLength="1" d="M560 178 L558 332" />
+          <!-- front wheel -->
+          <circle pathLength="1" cx="288" cy="328" r="46" />
+          <circle pathLength="1" cx="288" cy="328" r="28" />
+          <circle pathLength="1" cx="288" cy="328" r="8" />
+          <!-- rear wheel -->
+          <circle pathLength="1" cx="824" cy="328" r="46" />
+          <circle pathLength="1" cx="824" cy="328" r="28" />
+          <circle pathLength="1" cx="824" cy="328" r="8" />
+          <!-- spokes hint -->
+          <path pathLength="1" d="M288 300 L288 356 M260 328 L316 328 M268 308 L308 348 M268 348 L308 308" />
+          <path pathLength="1" d="M824 300 L824 356 M796 328 L852 328 M804 308 L844 348 M804 348 L844 308" />
+        </g>
+
+        <!-- hotspot anchors (visual dots in SVG coords for leader lines) -->
+        <g class="signature__anchors" aria-hidden="true">
+          {
+            zones.map((z) => (
+              <circle
+                class="signature__anchor"
+                data-sig-anchor={z.id}
+                cx={(z.x / 100) * 1100}
+                cy={(z.y / 100) * 420}
+                r="4.5"
+                fill="#c8102e"
+              />
+            ))
+          }
+        </g>
+      </svg>
+
+      <!-- HTML hotspots for a11y -->
+      <ul class="signature__hotspots" data-sig-hotspots>
+        {
+          zones.map((z) => (
+            <li class={`signature__hot signature__hot--${z.side}`} style={`--hx:${z.x}%; --hy:${z.y}%;`}>
+              <button
+                type="button"
+                class="signature__dot"
+                data-sig-hot={z.id}
+                data-price-ids={z.priceIds.join(",")}
+                aria-label={`${z.title}, ${z.price}`}
+                aria-controls="sig-panel"
+                aria-expanded="false"
+              >
+                <span class="signature__dot-ring" aria-hidden="true" />
+                <span class="sr-only">{z.label}</span>
+              </button>
+              <span class="signature__chip" aria-hidden="true">
+                <span class="signature__chip-label">{z.label}</span>
+                <span class="signature__chip-price">{z.price}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <aside class="signature__panel" id="sig-panel" data-sig-panel aria-live="polite">
+      <p class="signature__panel-kicker" data-sig-panel-kicker>Выберите зону</p>
+      <h3 class="signature__panel-title" data-sig-panel-title>Коснитесь точки на кузове</h3>
+      <p class="signature__panel-price" data-sig-panel-price></p>
+      <p class="signature__panel-detail" data-sig-panel-detail>
+        Линия пройдёт от фар до бампера — затем откроются зоны услуг с ценами из прайса.
+      </p>
+      <a class="signature__panel-link" href="#prices" data-sig-panel-link hidden>Смотреть в прайсе</a>
+    </aside>
+  </div>
+
+  <p class="signature__note">
+    Иллюстрация: оригинальный SVG-силуэт в пропорциях спортивного седана (M5 Competition vibe).
+    Цены — из карточки на Яндекс Картах, без выдуманных сумм.
+  </p>
+</section>
+
+<script>
+  const root = document.querySelector("[data-signature]");
+  if (!(root instanceof HTMLElement)) {
+    // no-op
+  } else {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const stage = root.querySelector("[data-sig-stage]");
+    const stroke = root.querySelector("[data-sig-stroke]");
+    const panelKicker = root.querySelector("[data-sig-panel-kicker]");
+    const panelTitle = root.querySelector("[data-sig-panel-title]");
+    const panelPrice = root.querySelector("[data-sig-panel-price]");
+    const panelDetail = root.querySelector("[data-sig-panel-detail]");
+    const panelLink = root.querySelector("[data-sig-panel-link]");
+    const buttons = Array.from(root.querySelectorAll("[data-sig-hot]"));
+
+    const zoneData: Record<
+      string,
+      { label: string; title: string; price: string; detail: string; priceIds: string[] }
+    > = {
+      optics: {
+        label: "Оптика",
+        title: "Bi-LED линзы и полировка фар",
+        price: "от 12 000 ₽",
+        detail: "Bi-LED от 12 000 ₽ · полировка фар от 3 500 ₽",
+        priceIds: ["price-biled", "price-headlights"],
+      },
+      ppf: {
+        label: "Защита",
+        title: "Оклейка бронеплёнкой",
+        price: "от 12 000 ₽",
+        detail: "Капот, бампер, крылья, зоны риска сколов",
+        priceIds: ["price-ppf"],
+      },
+      paint: {
+        label: "Кузов",
+        title: "Полировка кузова",
+        price: "от 14 000 ₽",
+        detail: "Лёгкая и глубокая — глубина цвета и блеск ЛКП",
+        priceIds: ["price-polish"],
+      },
+      ceramic: {
+        label: "Керамика",
+        title: "Керамика и жидкое стекло",
+        price: "от 18 900 ₽",
+        detail: "Керамика от 18 900 ₽ · жидкое стекло от 5 000 ₽",
+        priceIds: ["price-ceramic", "price-glasscoat"],
+      },
+      interior: {
+        label: "Салон",
+        title: "Химчистка салона",
+        price: "уточняйте",
+        detail: "Глубокая чистка — объём после осмотра",
+        priceIds: ["price-interior"],
+      },
+      sound: {
+        label: "Звук",
+        title: "Автозвук / магнитола",
+        price: "от 6 000 ₽",
+        detail: "От замены магнитолы до соревновательного уровня",
+        priceIds: ["price-audio"],
+      },
+      noise: {
+        label: "Шумоизоляция",
+        title: "Шумоизоляция",
+        price: "от 6 000 ₽",
+        detail: "Двери, пол, арки — тише в салоне",
+        priceIds: ["price-noise"],
+      },
+      rear: {
+        label: "Антикор",
+        title: "Антикор",
+        price: "от 20 000 ₽",
+        detail: "Обработка днища и скрытых полостей",
+        priceIds: ["price-anticor"],
+      },
+    };
+
+    let drawn = false;
+
+    const clearPriceHighlight = () => {
+      document.querySelectorAll(".price-list__row.is-lit").forEach((el) => {
+        el.classList.remove("is-lit");
+      });
+    };
+
+    const activate = (id: string, scrollPrices = true) => {
+      const data = zoneData[id];
+      if (!data) return;
+
+      buttons.forEach((btn) => {
+        const on = btn.getAttribute("data-sig-hot") === id;
+        btn.classList.toggle("is-active", on);
+        btn.setAttribute("aria-expanded", String(on));
+        const li = btn.closest(".signature__hot");
+        if (li) li.classList.toggle("is-active", on);
+      });
+
+      root.querySelectorAll("[data-sig-anchor]").forEach((el) => {
+        el.classList.toggle("is-active", el.getAttribute("data-sig-anchor") === id);
+      });
+
+      if (panelKicker) panelKicker.textContent = data.label;
+      if (panelTitle) panelTitle.textContent = data.title;
+      if (panelPrice) panelPrice.textContent = data.price;
+      if (panelDetail) panelDetail.textContent = data.detail;
+      const primaryPriceId = data.priceIds[0];
+      if (panelLink instanceof HTMLAnchorElement && primaryPriceId) {
+        panelLink.hidden = false;
+        panelLink.href = `#${primaryPriceId}`;
+        panelLink.textContent = "Смотреть в прайсе";
+      }
+
+      clearPriceHighlight();
+      data.priceIds.forEach((pid) => {
+        const row = document.getElementById(pid);
+        if (row) row.classList.add("is-lit");
+      });
+
+      if (scrollPrices && primaryPriceId) {
+        const first = document.getElementById(primaryPriceId);
+        if (first) {
+          first.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+        }
+      }
+    };
+
+    const revealHotspots = () => {
+      root.classList.add("is-ready");
+    };
+
+    const finishDraw = () => {
+      if (drawn) return;
+      drawn = true;
+      root.classList.add("is-drawn");
+      revealHotspots();
+    };
+
+    const playDraw = () => {
+      if (drawn || reduceMotion) {
+        root.classList.add("is-drawn", "is-instant");
+        finishDraw();
+        return;
+      }
+      root.classList.add("is-drawing");
+      const onEnd = (e: Event) => {
+        if (e.target !== stroke) return;
+        stroke?.removeEventListener("animationend", onEnd);
+        finishDraw();
+      };
+      stroke?.addEventListener("animationend", onEnd);
+      // fallback if animationend missed
+      window.setTimeout(finishDraw, 3200);
+    };
+
+    if (reduceMotion) {
+      root.classList.add("is-drawn", "is-instant", "is-ready");
+      drawn = true;
+    } else if ("IntersectionObserver" in window && stage) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              playDraw();
+              io.disconnect();
+            }
+          });
+        },
+        { threshold: 0.28, rootMargin: "0px 0px -8% 0px" },
+      );
+      io.observe(stage);
+    } else {
+      playDraw();
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-sig-hot");
+        if (!id) return;
+        if (!drawn) finishDraw();
+        activate(id, false);
+      });
+    });
+
+    // keyboard: left/right between hotspots when focused
+    root.addEventListener("keydown", (e) => {
+      if (!(e.target instanceof HTMLElement)) return;
+      if (!e.target.matches("[data-sig-hot]")) return;
+      const ids = buttons.map((b) => b.getAttribute("data-sig-hot")).filter(Boolean) as string[];
+      const cur = e.target.getAttribute("data-sig-hot");
+      if (!cur) return;
+      const idx = ids.indexOf(cur);
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        const next = buttons[(idx + 1) % buttons.length];
+        if (next instanceof HTMLElement) next.focus();
+      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        const prev = buttons[(idx - 1 + buttons.length) % buttons.length];
+        if (prev instanceof HTMLElement) prev.focus();
+      }
+    });
+  }
+</script>

@@ -7,6 +7,7 @@ import audiRear from "../assets/work/audi-a5-rear-quarter.jpg";
 import audiThree from "../assets/work/audi-a5-three-quarter.jpg";
 import audiRings from "../assets/work/audi-rings-detail.jpg";
 import salonRetrim from "../assets/work/salon-retrim.jpg";
+import SignatureViewer from "../components/SignatureViewer.astro";
 import "../styles/site.css";
 
 const siteUrl = "https://teassty.github.io/hollywood-car-detailing/";
@@ -58,20 +59,20 @@ const services = [
 ];
 
 const priceList = [
-  { title: "Полировка кузова", price: "от 14 000 ₽" },
-  { title: "Оклейка бронеплёнкой", price: "от 12 000 ₽" },
-  { title: "Керамика", price: "от 18 900 ₽" },
-  { title: "Жидкое стекло", price: "от 5 000 ₽" },
-  { title: "Bi-LED линзы", price: "от 12 000 ₽" },
-  { title: "Полировка фар", price: "от 3 500 ₽" },
-  { title: "Химчистка салона", price: "уточняйте" },
-  { title: "Автозвук / магнитола", price: "от 6 000 ₽" },
-  { title: "Шумоизоляция", price: "от 6 000 ₽" },
-  { title: "Перетяжка салона", price: "от 15 000 ₽" },
-  { title: "Антикор", price: "от 20 000 ₽" },
-  { title: "Контурная подсветка", price: "от 15 000 ₽" },
-  { title: "Сигнализация", price: "от 11 000 ₽" },
-  { title: "Кастом и допы", price: "уточняйте" },
+  { id: "price-polish", title: "Полировка кузова", price: "от 14 000 ₽" },
+  { id: "price-ppf", title: "Оклейка бронеплёнкой", price: "от 12 000 ₽" },
+  { id: "price-ceramic", title: "Керамика", price: "от 18 900 ₽" },
+  { id: "price-glasscoat", title: "Жидкое стекло", price: "от 5 000 ₽" },
+  { id: "price-biled", title: "Bi-LED линзы", price: "от 12 000 ₽" },
+  { id: "price-headlights", title: "Полировка фар", price: "от 3 500 ₽" },
+  { id: "price-interior", title: "Химчистка салона", price: "уточняйте" },
+  { id: "price-audio", title: "Автозвук / магнитола", price: "от 6 000 ₽" },
+  { id: "price-noise", title: "Шумоизоляция", price: "от 6 000 ₽" },
+  { id: "price-retrim", title: "Перетяжка салона", price: "от 15 000 ₽" },
+  { id: "price-anticor", title: "Антикор", price: "от 20 000 ₽" },
+  { id: "price-ambient", title: "Контурная подсветка", price: "от 15 000 ₽" },
+  { id: "price-alarm", title: "Сигнализация", price: "от 11 000 ₽" },
+  { id: "price-custom", title: "Кастом и допы", price: "уточняйте" },
 ];
 
 const portfolio = [
@@ -223,6 +224,7 @@ const jsonLd = {
 
         <nav class="site-nav" id="site-nav" data-nav aria-label="Разделы">
           <a href="#services">Услуги</a>
+          <a href="#signature">Зоны авто</a>
           <a href="#prices">Цены</a>
           <a href="#works">Работы</a>
           <a href="#process">Процесс</a>
@@ -293,6 +295,8 @@ const jsonLd = {
         </ul>
       </section>
 
+      <SignatureViewer />
+
       <section class="prices" id="prices" aria-labelledby="prices-title">
         <div class="section-head">
           <p class="kicker">Прайс</p>
@@ -305,7 +309,7 @@ const jsonLd = {
         <ul class="price-list" aria-label="Прайс услуг">
           {
             priceList.map((row) => (
-              <li class="price-list__row">
+              <li class="price-list__row" id={row.id}>
                 <span class="price-list__name">{row.title}</span>
                 <span class="price-list__sum">{row.price}</span>
               </li>
@@ -483,7 +487,7 @@ const jsonLd = {
 
       if (!reduceMotion && "IntersectionObserver" in window) {
         const targets = document.querySelectorAll(
-          ".section-head, .services__list li, .price-list__row, .shot, .process__list li, .reviews__grid li",
+          ".section-head, .services__list li, .price-list__row, .shot, .process__list li, .reviews__grid li, .signature__wrap",
         );
         const io = new IntersectionObserver(
           (entries) => {

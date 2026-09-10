@@ -42,6 +42,13 @@ html {
   .hero__media img {
     animation: none !important;
   }
+
+  .signature__stroke,
+  .signature__details path,
+  .signature__details circle {
+    stroke-dashoffset: 0 !important;
+    animation: none !important;
+  }
 }
 
 html,
@@ -572,6 +579,16 @@ a:hover {
   white-space: nowrap;
 }
 
+.price-list__row.is-lit {
+  background: linear-gradient(90deg, rgba(200, 16, 46, 0.12), transparent 70%);
+  box-shadow: inset 3px 0 0 var(--red);
+  padding-left: 0.75rem;
+  transition:
+    background 0.35s var(--ease),
+    box-shadow 0.35s var(--ease),
+    padding-left 0.35s var(--ease);
+}
+
 .prices__cta {
   width: var(--wrap);
   margin: 1.75rem auto 0;
@@ -587,6 +604,358 @@ a:hover {
   margin: 0;
   color: var(--soft);
   max-width: 36rem;
+}
+
+/* —— Signature Viewer —— */
+.signature {
+  padding: 4rem 0 2.5rem;
+  border-top: 1px solid var(--line);
+  overflow: clip;
+}
+
+.signature__wrap {
+  width: var(--wrap);
+  margin-inline: auto;
+  display: grid;
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+@media (min-width: 960px) {
+  .signature__wrap {
+    grid-template-columns: minmax(0, 1.55fr) minmax(240px, 0.7fr);
+    gap: 2rem;
+    align-items: center;
+  }
+}
+
+.signature__stage {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 72%, rgba(200, 16, 46, 0.1), transparent 70%),
+    linear-gradient(180deg, #101014 0%, #0b0b0c 100%);
+  border: 1px solid var(--line);
+  padding: clamp(1rem, 3vw, 1.75rem) clamp(0.5rem, 2vw, 1rem) 2.5rem;
+  min-height: 280px;
+}
+
+.signature__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.signature__fill {
+  opacity: 0;
+  transition: opacity 0.9s var(--ease) 0.15s;
+}
+
+.signature.is-drawn .signature__fill {
+  opacity: 1;
+}
+
+.signature__stroke {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  filter: drop-shadow(0 0 6px rgba(244, 241, 234, 0.25));
+}
+
+.signature.is-drawing .signature__stroke {
+  animation: sig-draw 2.4s var(--ease) forwards;
+}
+
+.signature.is-drawn .signature__stroke,
+.signature.is-instant .signature__stroke {
+  stroke-dashoffset: 0;
+  animation: none;
+}
+
+.signature__details path,
+.signature__details circle {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0.55;
+}
+
+.signature.is-drawing .signature__details path,
+.signature.is-drawing .signature__details circle {
+  animation: sig-draw 1.8s var(--ease) 0.55s forwards;
+}
+
+.signature.is-drawn .signature__details path,
+.signature.is-drawn .signature__details circle,
+.signature.is-instant .signature__details path,
+.signature.is-instant .signature__details circle {
+  stroke-dashoffset: 0;
+  animation: none;
+}
+
+@keyframes sig-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.signature__anchor {
+  opacity: 0;
+  transform-origin: center;
+  transition:
+    opacity 0.4s var(--ease),
+    r 0.25s var(--ease);
+}
+
+.signature.is-ready .signature__anchor {
+  opacity: 0.85;
+}
+
+.signature__anchor.is-active {
+  opacity: 1;
+}
+
+.signature__hotspots {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.signature__hot {
+  position: absolute;
+  left: var(--hx);
+  top: var(--hy);
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.45s var(--ease);
+}
+
+.signature.is-ready .signature__hot {
+  opacity: 1;
+}
+
+.signature__dot {
+  position: relative;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.signature__dot::before {
+  content: "";
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 0 2px rgba(11, 11, 12, 0.85);
+  transition:
+    transform 0.25s var(--ease),
+    background 0.25s var(--ease);
+}
+
+.signature__dot-ring {
+  position: absolute;
+  inset: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(200, 16, 46, 0.55);
+  animation: sig-pulse 2.2s ease-out infinite;
+}
+
+.signature.is-instant .signature__dot-ring {
+  animation: none;
+}
+
+.signature__dot:hover::before,
+.signature__dot.is-active::before,
+.signature__hot.is-active .signature__dot::before {
+  transform: scale(1.2);
+  background: #e01838;
+}
+
+.signature__dot:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@keyframes sig-pulse {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+}
+
+.signature__chip {
+  position: absolute;
+  left: 50%;
+  white-space: nowrap;
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.35rem 0.65rem;
+  background: rgba(19, 19, 22, 0.92);
+  border: 1px solid var(--line-strong);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 0);
+  transition:
+    opacity 0.25s var(--ease),
+    transform 0.25s var(--ease);
+}
+
+.signature__hot--top .signature__chip {
+  bottom: calc(100% + 0.35rem);
+  transform: translate(-50%, 6px);
+}
+
+.signature__hot--bottom .signature__chip {
+  top: calc(100% + 0.35rem);
+  transform: translate(-50%, -6px);
+}
+
+.signature__hot:hover .signature__chip,
+.signature__hot.is-active .signature__chip,
+.signature__dot:focus-visible + .signature__chip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.signature__chip-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mute);
+  font-weight: 700;
+}
+
+.signature__chip-price {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.03em;
+  color: var(--snow);
+}
+
+.signature__panel {
+  border-top: 2px solid var(--red);
+  padding: 1.25rem 0 0;
+  display: grid;
+  gap: 0.45rem;
+  align-content: start;
+}
+
+@media (min-width: 960px) {
+  .signature__panel {
+    border-top: 0;
+    border-left: 2px solid var(--red);
+    padding: 0.25rem 0 0.25rem 1.35rem;
+  }
+}
+
+.signature__panel-kicker {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 700;
+}
+
+.signature__panel-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.45rem, 3vw, 1.9rem);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--snow);
+  line-height: 1.05;
+}
+
+.signature__panel-price {
+  margin: 0.15rem 0 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--red);
+  min-height: 1.4em;
+}
+
+.signature__panel-detail {
+  margin: 0.25rem 0 0;
+  color: var(--mute);
+  font-size: 0.94rem;
+  max-width: 28rem;
+}
+
+.signature__panel-link {
+  margin-top: 0.85rem;
+  justify-self: start;
+  color: var(--snow);
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+  border-bottom: 1px solid var(--line-strong);
+  padding-bottom: 0.15rem;
+}
+
+.signature__panel-link:hover {
+  border-bottom-color: var(--snow);
+}
+
+.signature__panel-link[hidden] {
+  display: none;
+}
+
+.signature__note {
+  width: var(--wrap);
+  margin: 1.1rem auto 0;
+  color: var(--mute);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  max-width: 48rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signature__stroke,
+  .signature__details path,
+  .signature__details circle {
+    stroke-dashoffset: 0 !important;
+    animation: none !important;
+  }
+
+  .signature__fill {
+    opacity: 1 !important;
+  }
+
+  .signature__hot {
+    opacity: 1 !important;
+  }
+
+  .signature__dot-ring {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .signature__chip {
+    display: none;
+  }
+
+  .signature__stage {
+    padding-bottom: 1.5rem;
+  }
 }
 
 .portfolio {
