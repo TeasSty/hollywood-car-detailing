@@ -730,10 +730,52 @@ a:hover {
   overflow: hidden;
 }
 
+.signature__art-wrap--3d {
+  aspect-ratio: 16 / 9;
+  min-height: clamp(260px, 48vw, 460px);
+}
+
+.signature__canvas-host {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.signature__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.signature.is-focused .signature__canvas {
+  filter: brightness(0.78) saturate(0.85);
+  transition: filter 0.35s var(--ease);
+}
+
+.signature__credit {
+  width: var(--wrap);
+  margin: 0.65rem auto 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--mute);
+  max-width: 48rem;
+}
+
+.signature__credit a {
+  color: rgba(201, 162, 74, 0.9);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 @media (max-width: 700px) {
   .signature__art-wrap {
     aspect-ratio: 1.55 / 1;
     min-height: clamp(220px, 58vw, 320px);
+  }
+
+  .signature__art-wrap--3d {
+    aspect-ratio: 4 / 5;
+    min-height: clamp(300px, 92vw, 520px);
   }
 }
 
@@ -1137,7 +1179,6 @@ a:hover {
 @media (max-width: 700px) {
   .signature__art-wrap {
     width: 100%;
-    min-height: clamp(300px, 92vw, 520px);
   }
 
   .signature__car {

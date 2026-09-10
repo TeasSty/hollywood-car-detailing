@@ -1,6 +1,4 @@
 ---
-import SignatureCarArt from "./SignatureCarArt.astro";
-
 interface PriceRow {
   id: string;
   title: string;
@@ -10,118 +8,120 @@ interface PriceRow {
 interface Props {
   prices: PriceRow[];
   waHref: string;
+  modelUrl: string;
 }
 
-const { prices, waHref } = Astro.props;
+const { prices, waHref, modelUrl } = Astro.props;
 
-/** Real Hollywood services — titles + short subtitles for callouts */
-/** Hotspot anchors mapped to ¾ front-right concept sedan line art */
+/**
+ * One hotspot → one unique price row (no multi-row repeats).
+ * Anchors are local-space points on the fitted CarConcept model (¾ front-right bias).
+ */
 const zones = [
   {
     id: "optics",
-    title: "Bi-LED линзы",
-    subtitle: "полировка фар от 3 500 ₽",
+    title: "Оптика",
+    subtitle: "Bi-LED линзы",
     price: "от 12 000 ₽",
-    priceIds: ["price-biled", "price-headlights"],
-    ax: 18,
-    ay: 58,
-    lx: 3,
-    ly: 78,
+    priceId: "price-biled",
+    point: [0.72, 0.12, 1.05],
     side: "left" as const,
+    labelBias: [-16, 14],
   },
   {
     id: "ppf",
-    title: "Бронеплёнка",
-    subtitle: "защита от сколов",
+    title: "Плёнка",
+    subtitle: "капот и бампер",
     price: "от 12 000 ₽",
-    priceIds: ["price-ppf"],
-    ax: 28,
-    ay: 42,
-    lx: 4,
-    ly: 14,
+    priceId: "price-ppf",
+    point: [0.15, 0.38, 0.95],
     side: "left" as const,
+    labelBias: [-18, -16],
   },
   {
     id: "paint",
-    title: "Полировка кузова",
-    subtitle: "глубокий блеск ЛКП",
+    title: "Полировка",
+    subtitle: "кузов / ЛКП",
     price: "от 14 000 ₽",
-    priceIds: ["price-polish"],
-    ax: 52,
-    ay: 28,
-    lx: 48,
-    ly: 4,
+    priceId: "price-polish",
+    point: [0.05, 0.55, 0.1],
     side: "top" as const,
-  },
-  {
-    id: "interior",
-    title: "Химчистка салона",
-    subtitle: "чистота внутри",
-    price: "уточняйте",
-    priceIds: ["price-interior"],
-    ax: 48,
-    ay: 46,
-    lx: 78,
-    ly: 10,
-    side: "right" as const,
+    labelBias: [0, -18],
   },
   {
     id: "ceramic",
     title: "Керамика",
-    subtitle: "жидкое стекло от 5 000 ₽",
+    subtitle: "защитный слой",
     price: "от 18 900 ₽",
-    priceIds: ["price-ceramic", "price-glasscoat"],
-    ax: 72,
-    ay: 48,
-    lx: 96,
-    ly: 32,
+    priceId: "price-ceramic",
+    point: [-0.55, 0.42, -0.15],
     side: "right" as const,
+    labelBias: [18, -10],
   },
   {
-    id: "audio",
-    title: "Автозвук",
-    subtitle: "магнитола и акустика",
+    id: "glass",
+    title: "Стёкла",
+    subtitle: "жидкое стекло",
+    price: "от 5 000 ₽",
+    priceId: "price-glasscoat",
+    point: [0.2, 0.48, 0.35],
+    side: "right" as const,
+    labelBias: [20, -2],
+  },
+  {
+    id: "interior",
+    title: "Салон",
+    subtitle: "химчистка",
+    price: "уточняйте",
+    priceId: "price-interior",
+    point: [0.35, 0.28, 0.15],
+    side: "right" as const,
+    labelBias: [14, 12],
+  },
+  {
+    id: "wheels",
+    title: "Колёса",
+    subtitle: "шумка арок",
     price: "от 6 000 ₽",
-    priceIds: ["price-audio"],
-    ax: 42,
-    ay: 54,
-    lx: 32,
-    ly: 90,
+    priceId: "price-noise",
+    point: [0.85, -0.35, 0.55],
     side: "bottom" as const,
+    labelBias: [4, 16],
   },
   {
-    id: "anticor",
-    title: "Антикор",
+    id: "rear",
+    title: "Зад / антикор",
     subtitle: "днище и полости",
     price: "от 20 000 ₽",
-    priceIds: ["price-anticor"],
-    ax: 58,
-    ay: 78,
-    lx: 92,
-    ly: 88,
+    priceId: "price-anticor",
+    point: [-0.2, -0.25, -1.05],
     side: "right" as const,
+    labelBias: [16, 18],
   },
 ];
+
+const zonePriceIds = new Set(zones.map((z) => z.priceId));
+/** Deduped list: zone-linked rows first (unique), then remaining services once */
+const seen = new Set<string>();
+const uniquePrices: PriceRow[] = [];
+for (const row of prices) {
+  if (seen.has(row.id)) continue;
+  seen.add(row.id);
+  uniquePrices.push(row);
+}
+const orderedPrices = [
+  ...uniquePrices.filter((r) => zonePriceIds.has(r.id)),
+  ...uniquePrices.filter((r) => !zonePriceIds.has(r.id)),
+];
+
 const zoneByPrice: Record<string, string> = {};
-for (const z of zones) {
-  for (const pid of z.priceIds) zoneByPrice[pid] = z.id;
-}
+for (const z of zones) zoneByPrice[z.priceId] = z.id;
 
-/** Lowest starting price from the live list (полировка фар) */
 const fromPrice = "от 3 500 ₽";
-
-function elbowPath(ax: number, ay: number, lx: number, ly: number, side: string): string {
-  const mx =
-    side === "left" ? Math.min(ax, lx) + Math.abs(ax - lx) * 0.35 : Math.max(ax, lx) - Math.abs(ax - lx) * 0.35;
-  const my = side === "top" ? Math.min(ay, ly) + 4 : side === "bottom" ? Math.max(ay, ly) - 4 : (ay + ly) / 2;
-  if (side === "top" || side === "bottom") {
-    return `M ${ax} ${ay} L ${ax} ${my} L ${lx} ${my} L ${lx} ${ly}`;
-  }
-  return `M ${ax} ${ay} L ${mx} ${ay} L ${mx} ${ly} L ${lx} ${ly}`;
-}
+const zonesJson = JSON.stringify(zones);
 ---
 
-<section class="signature" id="signature" aria-labelledby="signature-title" data-signature>
+<section class="signature" id="signature" aria-labelledby="signature-title" data-signature data-sig-3d data-model-url={modelUrl}>
   <div class="signature__head">
     <div class="signature__head-copy">
       <p class="signature__kicker">Услуги</p>
@@ -130,7 +130,7 @@ function elbowPath(ax: number, ay: number, lx: number, ly: number, side: string)
         <span class="signature__title-gold">полный уход</span>
       </h2>
       <p class="signature__lead">
-        Нажмите на зону кузова — подсветятся линия, подпись и строки прайса. Реальные услуги и цены
+        3D-схема кузова: нажмите зону — подсветятся линия, подпись и строка прайса. Реальные услуги
         студии HOLLYWOOD.
       </p>
     </div>
@@ -140,83 +140,40 @@ function elbowPath(ax: number, ay: number, lx: number, ly: number, side: string)
   </div>
 
   <div class="signature__diagram" data-sig-stage>
-    <div class="signature__art-wrap">
-      <SignatureCarArt />
+    <div class="signature__art-wrap signature__art-wrap--3d">
+      <div class="signature__canvas-host" data-sig-canvas></div>
 
       <svg
         class="signature__callouts"
+        data-sig-callouts
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
         aria-hidden="true"
-        focusable="false"
-      >
-        {
-          zones.map((z) => (
-            <path
-              class="signature__line"
-              data-sig-line={z.id}
-              d={elbowPath(z.ax, z.ay, z.lx, z.ly, z.side)}
-              fill="none"
-              vector-effect="non-scaling-stroke"
-            />
-          ))
-        }
-      </svg>
+        focusable="false"></svg>
 
-      <ul class="signature__hotspots" data-sig-hotspots>
-        {
-          zones.map((z) => (
-            <li
-              class="signature__hot"
-              style={`left: ${z.ax}%; top: ${z.ay}%;`}
-              data-sig-hot-wrap={z.id}
-            >
-              <button
-                type="button"
-                class="signature__dot"
-                data-sig-hot={z.id}
-                data-price-ids={z.priceIds.join(",")}
-                aria-label={`${z.title}, ${z.price}. ${z.subtitle}`}
-                aria-controls="prices"
-                aria-pressed="false"
-              >
-                <span class="signature__dot-core" aria-hidden="true" />
-                <span class="signature__dot-ring" aria-hidden="true" />
-              </button>
-            </li>
-          ))
-        }
-      </ul>
-
-      <ul class="signature__labels" aria-hidden="true">
-        {
-          zones.map((z) => (
-            <li
-              class={`signature__label signature__label--${z.side}`}
-              style={`left: ${z.lx}%; top: ${z.ly}%;`}
-              data-sig-label={z.id}
-            >
-              <span class="signature__label-title">{z.title}</span>
-              <span class="signature__label-sub">{z.subtitle}</span>
-              <span class="signature__label-price">{z.price}</span>
-            </li>
-          ))
-        }
-      </ul>
+      <ul class="signature__hotspots" data-sig-hotspots></ul>
+      <ul class="signature__labels" data-sig-labels aria-hidden="true"></ul>
     </div>
   </div>
+
+  <p class="signature__credit">
+    3D: CarConcept —
+    <a href="https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept" target="_blank" rel="noopener noreferrer">Khronos glTF Sample Assets</a>
+    (исходник Unity Fan, CC0; сборка Khronos). Wireframe / studio look — HOLLYWOOD site.
+  </p>
 
   <div class="signature__prices" id="prices" data-sig-prices>
     <div class="signature__prices-head">
       <p class="signature__panel-kicker">Прайс</p>
       <h3 class="signature__prices-title">Цены</h3>
       <p class="signature__prices-lead">
-        Стартовые цены с Яндекс Карт. Выберите зону на схеме — строки подсветятся.
+        Стартовые цены с Яндекс Карт. Одна услуга — одна строка. Выберите зону на 3D — строка
+        подсветится.
       </p>
     </div>
     <ul class="signature__price-list" data-sig-price-list>
       {
-        prices.map((row) => (
+        orderedPrices.map((row) => (
           <li
             class="price-list__row"
             id={row.id}
@@ -241,9 +198,15 @@ function elbowPath(ax: number, ay: number, lx: number, ly: number, side: string)
   <p class="signature__note">Цены — из карточки на Яндекс Картах. Итоговая сумма после осмотра авто.</p>
 </section>
 
+<script id="signature-zones-data" type="application/json" is:inline set:html={zonesJson} />
 <script>
-  import { initSignatureViewer } from "../scripts/signature-viewer";
+  import { initSignature3D } from "../scripts/signature-3d";
 
   const root = document.querySelector("[data-signature]");
-  if (root instanceof HTMLElement) initSignatureViewer(root);
+  const dataEl = document.getElementById("signature-zones-data");
+  if (root instanceof HTMLElement && dataEl?.textContent) {
+    const modelUrl = root.dataset.modelUrl || "";
+    const zones = JSON.parse(dataEl.textContent);
+    initSignature3D(root, zones, modelUrl);
+  }
 </script>
