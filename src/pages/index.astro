@@ -22,153 +22,72 @@ const streetAddress = "Ленинградский проспект, 123Д";
 const defaultWa = "Здравствуйте! Хочу записаться в HOLLYWOOD CAR DETAILING.";
 const waHref = `${waBase}?text=${encodeURIComponent(defaultWa)}`;
 
-/** Prices from Yandex organization price list — shown as «от» / уточняйте. */
-const priceList = [
+const services = [
   {
     title: "Полировка кузова",
-    text: "Лёгкая и глубокая полировка: глубина цвета и блеск ЛКП.",
-    price: "от 14 000 ₽",
+    text: "Лёгкая и глубокая полировка — глубина цвета и блеск ЛКП.",
   },
   {
     title: "Оклейка бронеплёнкой",
     text: "Прозрачная или цветная защита кузова от сколов и царапин.",
-    price: "от 12 000 ₽",
   },
   {
-    title: "Керамика",
-    text: "Защитное керамическое покрытие кузова. Пакет — по осмотру.",
-    price: "от 18 900 ₽",
+    title: "Керамика и жидкое стекло",
+    text: "Защитные покрытия кузова с гидрофобным эффектом.",
   },
   {
-    title: "Жидкое стекло",
-    text: "Гидрофобное защитное покрытие кузова.",
-    price: "от 5 000 ₽",
-  },
-  {
-    title: "Bi-LED линзы",
+    title: "Bi-LED линзы и полировка фар",
     text: "Установка линз, полировка и бронирование оптики.",
-    price: "от 12 000 ₽",
-  },
-  {
-    title: "Полировка фар",
-    text: "Обычная и химическая полировка фар и фонарей.",
-    price: "от 3 500 ₽",
   },
   {
     title: "Химчистка салона",
-    text: "Глубокая чистка салона. Объём и срок — после осмотра.",
-    price: "уточняйте",
+    text: "Глубокая чистка салона — объём и срок после осмотра.",
   },
   {
-    title: "Автозвук / магнитола",
-    text: "От штатной замены до соревновательного уровня.",
-    price: "от 6 000 ₽",
-  },
-  {
-    title: "Шумоизоляция",
-    text: "Салон и арки. Материал и класс подбираем под авто.",
-    price: "от 6 000 ₽",
+    title: "Автозвук и шумоизоляция",
+    text: "От замены магнитолы до соревновательного уровня и шумоизоляции.",
   },
   {
     title: "Перетяжка салона",
-    text: "Потолок, дверные карты и вставки. Алькантара и аналоги.",
-    price: "от 15 000 ₽",
+    text: "Потолок, дверные карты и вставки — алькантара и аналоги.",
   },
   {
-    title: "Антикор",
-    text: "Обработка днища и арок для новых и подержанных авто.",
-    price: "от 20 000 ₽",
-  },
-  {
-    title: "Контурная подсветка",
-    text: "Атмосферная подсветка салона. Установка под ключ.",
-    price: "от 15 000 ₽",
-  },
-  {
-    title: "Сигнализация",
-    text: "Установка охранных систем и модулей обхода.",
-    price: "от 11 000 ₽",
-  },
-  {
-    title: "Кастом и допы",
-    text: "Обвесы, доводчики, электротонировка, звёздное небо и нестандарт.",
-    price: "уточняйте",
+    title: "Антикор и подсветка",
+    text: "Обработка днища, контурная подсветка, сигнализация и кастом.",
   },
 ];
 
-const reasons = [
-  {
-    title: "Всё в одном боксе",
-    text: "Кузов, салон, свет, звук и защита — без поездок по городу.",
-  },
-  {
-    title: "Гарантийный заказ-наряд",
-    text: "Работы официально, с гарантией на услуги и материалы.",
-  },
-  {
-    title: "Закрытая парковка",
-    text: "Видеонаблюдение, зона ожидания, Wi‑Fi. Оплата наличными, картой и безналом.",
-  },
-  {
-    title: "На связи каждый день",
-    text: "Звонок, WhatsApp, Telegram или VK — ответим и запишем.",
-  },
+const priceList = [
+  { title: "Полировка кузова", price: "от 14 000 ₽" },
+  { title: "Оклейка бронеплёнкой", price: "от 12 000 ₽" },
+  { title: "Керамика", price: "от 18 900 ₽" },
+  { title: "Жидкое стекло", price: "от 5 000 ₽" },
+  { title: "Bi-LED линзы", price: "от 12 000 ₽" },
+  { title: "Полировка фар", price: "от 3 500 ₽" },
+  { title: "Химчистка салона", price: "уточняйте" },
+  { title: "Автозвук / магнитола", price: "от 6 000 ₽" },
+  { title: "Шумоизоляция", price: "от 6 000 ₽" },
+  { title: "Перетяжка салона", price: "от 15 000 ₽" },
+  { title: "Антикор", price: "от 20 000 ₽" },
+  { title: "Контурная подсветка", price: "от 15 000 ₽" },
+  { title: "Сигнализация", price: "от 11 000 ₽" },
+  { title: "Кастом и допы", price: "уточняйте" },
 ];
 
 const portfolio = [
-  {
-    image: audiThree,
-    alt: "Audi A5 после работ в студии HOLLYWOOD CAR DETAILING",
-    span: "wide",
-  },
-  {
-    image: audiHood,
-    alt: "Капот Audi A5 крупным планом после детейлинга",
-    span: "tall",
-  },
-  {
-    image: audiFront,
-    alt: "Audi A5 в боксе студии",
-    span: "mid",
-  },
-  {
-    image: audiRear,
-    alt: "Задняя четверть Audi A5",
-    span: "mid",
-  },
-  {
-    image: audiRings,
-    alt: "Деталь эмблемы Audi крупным планом",
-    span: "sq",
-  },
-  {
-    image: salonRetrim,
-    alt: "Иллюстрация чистого кожаного салона автомобиля (фото Unsplash)",
-    span: "wide",
-  },
+  { image: audiThree, alt: "Audi A5 после работ в студии HOLLYWOOD CAR DETAILING", span: "wide" },
+  { image: audiHood, alt: "Капот Audi A5 крупным планом после детейлинга", span: "tall" },
+  { image: audiFront, alt: "Audi A5 в боксе студии", span: "mid" },
+  { image: audiRear, alt: "Задняя четверть Audi A5", span: "mid" },
+  { image: audiRings, alt: "Деталь эмблемы Audi крупным планом", span: "sq" },
+  { image: salonRetrim, alt: "Чистый кожаный салон автомобиля", span: "wide" },
 ];
 
 const steps = [
-  {
-    n: "01",
-    title: "Заявка",
-    text: "Пишете в WhatsApp или звоните: авто, задача, удобный день.",
-  },
-  {
-    n: "02",
-    title: "Осмотр",
-    text: "В студии смотрим объём работ и согласуем стоимость до старта.",
-  },
-  {
-    n: "03",
-    title: "Работа",
-    text: "Выполняем детейлинг, защиту, свет, звук или кастом в одном месте.",
-  },
-  {
-    n: "04",
-    title: "Сдача",
-    text: "Отдаём автомобиль с гарантийным заказ-нарядом.",
-  },
+  { n: "01", title: "Заявка", text: "Пишете в WhatsApp или звоните: авто, задача, удобный день." },
+  { n: "02", title: "Осмотр", text: "В студии смотрим объём работ и согласуем стоимость до старта." },
+  { n: "03", title: "Работа", text: "Детейлинг, защита, свет, звук или кастом — всё в одном боксе." },
+  { n: "04", title: "Сдача", text: "Отдаём автомобиль с гарантийным заказ-нарядом." },
 ];
 
 const reviews = [
@@ -190,8 +109,6 @@ const reviews = [
   },
 ];
 
-const heroTags = ["Оклейка", "Полировка", "Химчистка", "Bi-LED", "Автозвук", "Шумоизоляция"];
-
 const ogPath = `${siteUrl}og-cover.jpg`;
 const jsonLd = {
   "@context": "https://schema.org",
@@ -210,11 +127,7 @@ const jsonLd = {
     addressRegion: "Ярославская область",
     addressCountry: "RU",
   },
-  geo: {
-    "@type": "GeoCoordinates",
-    latitude: 57.6993,
-    longitude: 39.7584,
-  },
+  geo: { "@type": "GeoCoordinates", latitude: 57.6993, longitude: 39.7584 },
   openingHoursSpecification: [
     {
       "@type": "OpeningHoursSpecification",
@@ -270,7 +183,7 @@ const jsonLd = {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
@@ -310,8 +223,9 @@ const jsonLd = {
 
         <nav class="site-nav" id="site-nav" data-nav aria-label="Разделы">
           <a href="#services">Услуги</a>
-          <a href="#portfolio">Работы</a>
-          <a href="#process">Как работаем</a>
+          <a href="#prices">Цены</a>
+          <a href="#works">Работы</a>
+          <a href="#process">Процесс</a>
           <a href="#reviews">Отзывы</a>
           <a href="#contacts">Контакты</a>
         </nav>
@@ -355,82 +269,49 @@ const jsonLd = {
               >WhatsApp</a
             >
           </div>
-          <ul class="hero__tags" aria-label="Основные услуги">
-            {
-              heroTags.map((tag) => (
-                <li>{tag}</li>
-              ))
-            }
-          </ul>
         </div>
       </section>
 
-      <section class="about" id="about" aria-labelledby="about-title">
-        <div class="about__grid">
-          <div class="about__copy">
-            <p class="kicker">О студии</p>
-            <h2 id="about-title">Профессиональный детейлинг в Ярославле</h2>
-            <p>
-              HOLLYWOOD CAR DETAILING — студия, где кузов, салон, свет и звук делают в одном месте.
-              Работаем официально, с гарантией на услуги и материалы.
-            </p>
-            <ul class="about__points">
-              {
-                reasons.map((r) => (
-                  <li>
-                    <strong>{r.title}</strong>
-                    <span>{r.text}</span>
-                  </li>
-                ))
-              }
-            </ul>
-          </div>
-          <figure class="about__photo">
-            <Image
-              src={audiThree}
-              alt="Автомобиль после работ в студии HOLLYWOOD"
-              widths={[640, 960, 1280, 1600]}
-              sizes="(max-width: 900px) 100vw, 48vw"
-              loading="lazy"
-              quality={86}
-            />
-            <figcaption>
-              <span>Рейтинг 5.0</span>
-              <span aria-hidden="true">·</span>
-              <span>60+ отзывов</span>
-            </figcaption>
-          </figure>
-        </div>
-      </section>
-
-      <section class="prices" id="services" aria-labelledby="services-title">
+      <section class="services" id="services" aria-labelledby="services-title">
         <div class="section-head">
-          <p class="kicker">Прайс</p>
-          <h2 id="services-title">Цены от прайса на Яндекс Картах</h2>
+          <p class="kicker">Услуги</p>
+          <h2 id="services-title">Что делаем в студии</h2>
           <p>
-            Стоимость зависит от автомобиля и объёма. Ниже — стартовые цены из карточки организации;
-            точную сумму скажем после осмотра.
+            Кузов, салон, свет, звук и защита — официально, с гарантией на услуги и материалы.
+            Закрытая парковка, зона ожидания, Wi‑Fi.
           </p>
         </div>
-        <div class="price-list" role="table" aria-label="Прайс услуг">
-          <div class="price-list__head" role="row">
-            <span role="columnheader">Услуга</span>
-            <span role="columnheader">Цена</span>
-          </div>
+        <ul class="services__list">
           {
-            priceList.map((row) => (
-              <div class="price-list__row" role="row">
-                <div class="price-list__info" role="cell">
-                  <h3>{row.title}</h3>
-                  <p>{row.text}</p>
-                </div>
-                <span class="price-list__sum" role="cell">
-                  {row.price}
-                </span>
-              </div>
+            services.map((item) => (
+              <li>
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </li>
             ))
           }
+        </ul>
+      </section>
+
+      <section class="prices" id="prices" aria-labelledby="prices-title">
+        <div class="section-head">
+          <p class="kicker">Прайс</p>
+          <h2 id="prices-title">Цены</h2>
+          <p>
+            Стартовые цены из карточки на Яндекс Картах. Точную сумму скажем после осмотра
+            автомобиля.
+          </p>
         </div>
+        <ul class="price-list" aria-label="Прайс услуг">
+          {
+            priceList.map((row) => (
+              <li class="price-list__row">
+                <span class="price-list__name">{row.title}</span>
+                <span class="price-list__sum">{row.price}</span>
+              </li>
+            ))
+          }
+        </ul>
         <div class="prices__cta">
           <p>Не нашли нужную услугу — напишите, подскажем по вашему авто.</p>
           <a class="btn btn--solid" href={waHref} target="_blank" rel="noopener noreferrer"
@@ -439,11 +320,11 @@ const jsonLd = {
         </div>
       </section>
 
-      <section class="portfolio" id="portfolio" aria-labelledby="portfolio-title">
+      <section class="portfolio" id="works" aria-labelledby="works-title">
         <div class="section-head">
           <p class="kicker">Портфолио</p>
-          <h2 id="portfolio-title">Работы из бокса</h2>
-          <p>Реальные кадры студии. Салон — иллюстративное фото Unsplash.</p>
+          <h2 id="works-title">Наши работы</h2>
+          <p>Реальные кадры из бокса HOLLYWOOD CAR DETAILING.</p>
         </div>
         <div class="portfolio__masonry">
           {
@@ -490,8 +371,8 @@ const jsonLd = {
           <h2 id="reviews-title">Что говорят клиенты</h2>
           <p>
             С{" "}
-            <a href={mapsUrl} target="_blank" rel="noopener noreferrer">Яндекс Карт</a>
-            {" "}и карточки организации. Рейтинг 5.0 · Good Place 2026.
+            <a href={mapsUrl} target="_blank" rel="noopener noreferrer">Яндекс Карт</a>. Рейтинг
+            5.0 · Good Place 2026.
           </p>
         </div>
         <ul class="reviews__grid">
@@ -602,7 +483,7 @@ const jsonLd = {
 
       if (!reduceMotion && "IntersectionObserver" in window) {
         const targets = document.querySelectorAll(
-          ".section-head, .about__copy, .about__photo, .price-list__row, .shot, .process__list li, .reviews__grid li",
+          ".section-head, .services__list li, .price-list__row, .shot, .process__list li, .reviews__grid li",
         );
         const io = new IntersectionObserver(
           (entries) => {
