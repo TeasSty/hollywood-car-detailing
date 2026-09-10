@@ -52,6 +52,10 @@ html {
     stroke-dashoffset: 0 !important;
   }
 
+  .signature__car--fill-art .signature__stroke-draw {
+    opacity: revert-layer !important;
+  }
+
   .signature__dot-ring {
     animation: none !important;
   }
@@ -715,15 +719,22 @@ a:hover {
 .signature__art-wrap {
   position: relative;
   isolation: isolate;
-  width: min(100%, 720px);
+  width: min(100%, 980px);
   margin-inline: auto;
-  aspect-ratio: 1 / 1;
-  min-height: clamp(300px, 78vw, 640px);
+  aspect-ratio: 2.6 / 1;
+  min-height: clamp(200px, 38vw, 380px);
   background:
-    radial-gradient(ellipse 55% 40% at 50% 55%, rgba(201, 162, 74, 0.07), transparent 70%),
-    #050505;
+    radial-gradient(ellipse 60% 55% at 48% 58%, rgba(201, 162, 74, 0.09), transparent 68%),
+    linear-gradient(180deg, #0a0a0b 0%, #050505 55%, #08080a 100%);
   border: 1px solid rgba(244, 241, 234, 0.08);
   overflow: hidden;
+}
+
+@media (max-width: 700px) {
+  .signature__art-wrap {
+    aspect-ratio: 1.55 / 1;
+    min-height: clamp(220px, 58vw, 320px);
+  }
 }
 
 .signature__car-mount {
@@ -732,28 +743,50 @@ a:hover {
   display: grid;
   place-items: center;
   pointer-events: none;
+  padding: 4% 3% 6%;
 }
 
 .signature__car {
   position: relative;
   left: auto;
   top: auto;
-  width: min(94%, 640px);
+  width: min(96%, 920px);
   height: auto;
-  color: rgba(228, 228, 222, 0.92);
+  max-height: 100%;
+  color: rgba(232, 230, 222, 0.95);
   transform: none;
   pointer-events: none;
-  opacity: 0.94;
-  transition: opacity 0.4s var(--ease);
+  opacity: 0.96;
+  transition:
+    opacity 0.4s var(--ease),
+    filter 0.4s var(--ease);
+}
+
+.signature__car--fill-art {
+  color: #e8e4dc;
+  filter: drop-shadow(0 0 18px rgba(201, 162, 74, 0.12));
 }
 
 .signature.is-focused .signature__car {
-  opacity: 0.5;
+  opacity: 0.42;
+  filter: grayscale(0.15);
+}
+
+.signature.is-focused .signature__car--fill-art {
+  opacity: 0.38;
 }
 
 .signature__stroke-draw.is-armed {
-  /* dashoffset driven by scroll in signature-viewer.ts */
+  /* dashoffset / opacity driven by scroll in signature-viewer.ts */
   vector-effect: non-scaling-stroke;
+}
+
+.signature__car--fill-art .signature__stroke-draw.is-armed {
+  transition: fill 0.35s var(--ease);
+}
+
+.signature.is-focused .signature__car--fill-art .signature__stroke-draw {
+  fill: rgba(200, 198, 190, 0.55);
 }
 
 .signature__stroke--main {

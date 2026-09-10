@@ -15,7 +15,7 @@ interface Props {
 const { prices, waHref } = Astro.props;
 
 /** Real Hollywood services — titles + short subtitles for callouts */
-/** Hotspot anchors mapped to the side-elevation (middle band) of the blueprint */
+/** Hotspot anchors mapped to ¾ front-right concept sedan line art */
 const zones = [
   {
     id: "optics",
@@ -23,10 +23,10 @@ const zones = [
     subtitle: "полировка фар от 3 500 ₽",
     price: "от 12 000 ₽",
     priceIds: ["price-biled", "price-headlights"],
-    ax: 22,
-    ay: 52,
-    lx: 4,
-    ly: 68,
+    ax: 18,
+    ay: 58,
+    lx: 3,
+    ly: 78,
     side: "left" as const,
   },
   {
@@ -35,10 +35,10 @@ const zones = [
     subtitle: "защита от сколов",
     price: "от 12 000 ₽",
     priceIds: ["price-ppf"],
-    ax: 34,
-    ay: 44,
-    lx: 6,
-    ly: 16,
+    ax: 28,
+    ay: 42,
+    lx: 4,
+    ly: 14,
     side: "left" as const,
   },
   {
@@ -47,10 +47,10 @@ const zones = [
     subtitle: "глубокий блеск ЛКП",
     price: "от 14 000 ₽",
     priceIds: ["price-polish"],
-    ax: 50,
-    ay: 38,
-    lx: 42,
-    ly: 6,
+    ax: 52,
+    ay: 28,
+    lx: 48,
+    ly: 4,
     side: "top" as const,
   },
   {
@@ -59,10 +59,10 @@ const zones = [
     subtitle: "чистота внутри",
     price: "уточняйте",
     priceIds: ["price-interior"],
-    ax: 52,
-    ay: 48,
-    lx: 82,
-    ly: 12,
+    ax: 48,
+    ay: 46,
+    lx: 78,
+    ly: 10,
     side: "right" as const,
   },
   {
@@ -71,10 +71,10 @@ const zones = [
     subtitle: "жидкое стекло от 5 000 ₽",
     price: "от 18 900 ₽",
     priceIds: ["price-ceramic", "price-glasscoat"],
-    ax: 68,
-    ay: 46,
-    lx: 94,
-    ly: 30,
+    ax: 72,
+    ay: 48,
+    lx: 96,
+    ly: 32,
     side: "right" as const,
   },
   {
@@ -83,10 +83,10 @@ const zones = [
     subtitle: "магнитола и акустика",
     price: "от 6 000 ₽",
     priceIds: ["price-audio"],
-    ax: 48,
-    ay: 56,
-    lx: 40,
-    ly: 92,
+    ax: 42,
+    ay: 54,
+    lx: 32,
+    ly: 90,
     side: "bottom" as const,
   },
   {
@@ -95,14 +95,13 @@ const zones = [
     subtitle: "днище и полости",
     price: "от 20 000 ₽",
     priceIds: ["price-anticor"],
-    ax: 74,
-    ay: 62,
-    lx: 94,
-    ly: 78,
+    ax: 58,
+    ay: 78,
+    lx: 92,
+    ly: 88,
     side: "right" as const,
   },
 ];
-
 const zoneByPrice: Record<string, string> = {};
 for (const z of zones) {
   for (const pid of z.priceIds) zoneByPrice[pid] = z.id;

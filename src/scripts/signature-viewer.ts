@@ -28,6 +28,8 @@ export function initSignatureViewer(root: HTMLElement) {
   const lines = Array.from(root.querySelectorAll<SVGPathElement>("[data-sig-line]"));
   const wraps = Array.from(root.querySelectorAll<HTMLElement>("[data-sig-hot-wrap]"));
   const labels = Array.from(root.querySelectorAll<HTMLElement>("[data-sig-label]"));
+  const carSvg = root.querySelector<SVGElement>("[data-sig-car]");
+  const fillMode = carSvg?.getAttribute("data-sig-mode") === "fill";
   const carStrokes = Array.from(
     root.querySelectorAll<SVGGeometryElement>(".signature__stroke-draw"),
   ).sort((a, b) => {
@@ -39,10 +41,10 @@ export function initSignatureViewer(root: HTMLElement) {
     return oa - ob;
   });
 
-  let activeId: string | null = null;
   let ready = false;
   let drawComplete = false;
   const strokeLens: number[] = [];
+  const baseOpacity: number[] = [];
 
   const markReady = () => {
     if (ready) return;
@@ -56,7 +58,6 @@ export function initSignatureViewer(root: HTMLElement) {
   };
 
   const setActive = (id: string | null) => {
-    activeId = id;
     const hasActive = id !== null;
     root.classList.toggle("is-focused", hasActive);
 
@@ -143,6 +144,13 @@ export function initSignatureViewer(root: HTMLElement) {
 
   const prepareStrokes = () => {
     carStrokes.forEach((el, i) => {
+      if (fillMode) {
+        const o = Number(el.getAttribute("opacity") || 0.8);
+        baseOpacity[i] = o;
+        el.style.opacity = "0";
+        el.classList.add("is-armed");
+        return;
+      }
       try {
         const len = Math.max(el.getTotalLength(), 1);
         strokeLens[i] = len;
@@ -171,13 +179,19 @@ export function initSignatureViewer(root: HTMLElement) {
     const n = carStrokes.length;
     if (n === 0) return;
 
-    // Main outline finishes by ~0.45, panels through ~0.82, details to 1
     carStrokes.forEach((el, i) => {
-      const len = strokeLens[i];
-      if (!len) return;
       const start = i / n;
       const end = Math.min(1, (i + 1.35) / n);
       const local = clamp((p - start) / Math.max(end - start, 0.001));
+
+      if (fillMode) {
+        const base = baseOpacity[i] ?? 0.8;
+        el.style.opacity = String(base * local);
+        return;
+      }
+
+      const len = strokeLens[i];
+      if (!len) return;
       el.style.strokeDashoffset = String(len * (1 - local));
     });
 
@@ -195,7 +209,6 @@ export function initSignatureViewer(root: HTMLElement) {
     if (!stage) return 1;
     const rect = stage.getBoundingClientRect();
     const vh = window.innerHeight || 1;
-    // Start drawing when section enters lower viewport; finish as it centers
     const start = vh * 0.88;
     const end = vh * 0.28;
     return clamp((start - rect.top) / Math.max(start - end, 1));

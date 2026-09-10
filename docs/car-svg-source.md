@@ -4,28 +4,35 @@
 
 | Field | Value |
 | --- | --- |
-| **File** | `src/assets/signature/car-line.svg` (processed from FreeSVG download) |
-| **Title** | Blueprints car (Shelby Cobra orthographic blueprint) |
-| **Source page** | https://freesvg.org/blueprints-car |
-| **Download** | https://freesvg.org/download/187364 |
-| **Upstream** | Openclipart remix of Shelby Cobra blueprint (Public Domain) |
-| **License** | **Public Domain / CC0** (FreeSVG: “Public Domain”; Creative Commons CC0 1.0 deed linked on page) |
+| **File** | `src/assets/signature/car-line.svg` (processed from Openclipart) |
+| **Title** | Concept Car Line Art 2 By LeeRosario |
+| **Source page** | https://openclipart.org/detail/313046/concept-car-line-art-2-by-leerosario |
+| **Mirror** | https://freesvg.org/1545945717 (related Concept Car Line Art series) |
+| **Upstream** | GDJ remix from Pixabay concept-car photograph → vector line art |
+| **License** | **Public Domain / CC0** (Openclipart PD dedication) |
 | **Commercial use** | Yes — PD/CC0 allows copy, modify, distribute, and commercial use without attribution |
 
-## Why this one (not an icon)
+## Why this one
 
-- **~162 stroked vector primitives** (paths, circles, rects) with thin line work — not a 10–20 path pictogram.
-- Classic **multi-view technical blueprint**: top, side, front, and rear orthographic projections.
-- Includes body panels, wheel arches, wire-spoke wheels, cockpit/seats, grille, lights, exhaust, and panel seams — suitable for stroke-dasharray “draw” animation.
-- Explicit **stroke-based** geometry (`fill:none` + strokes), which is required for dashoffset animation. Higher-detail Ferrari/Alpine FreeSVG technical drawings were evaluated but are **fill-based CorelDRAW compound paths** and cannot drive a clean stroke draw.
+- **¾ front premium sedan / concept coupe** — matches the gold-callout mockup intent far better than orthographic Shelby Cobra blueprints.
+- **~218 filled vector primitives** forming fine technical line work (not a 10–20 path pictogram).
+- Reads as **white wireframe on dark** when `fill` is set to `currentColor`.
+- Scroll “draw” uses **progressive opacity reveal** (fill-based art); gold hotspots, elbow callouts, and price sync stay unchanged.
 
-## Candidates reviewed (rejected or runner-up)
+## Candidates reviewed
 
-1. **Ferrari 275 GTB 1964** — https://freesvg.org/ferrari-275gtb-1964 — Public Domain. Extremely detailed 4-view technical art (~400KB). **Rejected for integration:** fill-only compound paths (5 paths), not stroke-dasharray friendly.
-2. **Renault Alpine A310 V6 1977** — https://freesvg.org/renault-alpine-a310-v6-1977 — Public Domain. Same fill-based technical style as Ferrari. **Rejected** for the same reason.
-3. **SVG Repo “Sedan Car Model”** and similar outline icons — **Rejected** as flat icons / silhouettes.
-4. **Wikimedia VW Golf 3 profile** — CC0, but colored filled side illustration, not a technical line blueprint.
+1. **Shelby Cobra orthographic blueprint** (FreeSVG / Openclipart CC0) — strong stroke-dasharray candidate; **replaced** because multi-view roadster ≠ premium sedan ¾.
+2. **Ferrari 275 GTB 1964 / Alpine A310** — PD technical sheets; fill-only CorelDRAW compounds; classic sports cars, not sedan ¾.
+3. **Mercedes Class A W169 outline** (Openclipart PD) — stroke-based side outline; too sparse / side-only for callout theatre.
+4. **Honda S2000 outline** — stroke-based; sports roadster, incomplete visual weight.
+5. **Car lineart (halftone vintage)** — ¾ view but comic/halftone, not technical premium.
+6. **SVG Repo / silhouette sedans** — rejected as flat icons.
+7. **Kenney / low-poly GLB** — previously rejected by user as toy-like; quality free commercial sedans on Sketchfab are often rip-derived or NC — not shipped.
+
+## Processing
+
+`scripts/process-signature-car.mjs` strips metadata, sorts paths front→rear, tags `data-tier` / `data-draw-order`, and writes `src/assets/signature/car-line.svg`.
 
 ## Honest quality note
 
-This is a **genuine technical blueprint** (classic sports car / Cobra-style roadster), not a luxury sedan ¾ view. Free stroke-based premium-sedan SVGs with commercial-safe licenses were not found at comparable detail. Among free PD/CC0 options that support scroll draw animation, this was the strongest match.
+This is a **genuine detailed concept-sedan line drawing** in ¾ view. It is **fill-based** (line shapes as filled paths), so animation is opacity reveal rather than stroke-dashoffset. Free **stroke-based** commercial-OK premium-sedan ¾ SVGs at this detail level were not found after thorough search.
