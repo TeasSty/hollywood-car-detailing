@@ -65,33 +65,41 @@ const takes = [
     image: audiThree,
     alt: "Audi A5 после работ в студии HOLLYWOOD CAR DETAILING",
     label: "Кузов",
-  },
-  {
-    image: salonRetrim,
-    alt: "Иллюстрация чистого кожаного салона автомобиля (фото Unsplash)",
-    label: "Салон",
+    frame: "lead",
   },
   {
     image: audiHood,
     alt: "Капот Audi A5 крупным планом после детейлинга",
     label: "Блик",
+    frame: "tall",
   },
   {
     image: audiFront,
     alt: "Audi A5 в боксе студии",
     label: "Бокс",
+    frame: "wide",
   },
   {
     image: audiRear,
     alt: "Задняя четверть Audi A5",
     label: "Линия",
+    frame: "mid",
   },
   {
     image: audiRings,
     alt: "Деталь эмблемы Audi крупным планом",
     label: "Деталь",
+    frame: "detail",
+  },
+  {
+    image: salonRetrim,
+    alt: "Иллюстрация чистого кожаного салона автомобиля (фото Unsplash)",
+    label: "Салон",
+    frame: "overlap",
   },
 ];
+
+const brandLetters = "HOLLYWOOD".split("");
 
 const steps = [
   {
@@ -268,8 +276,8 @@ const jsonLd = {
     </header>
 
     <main id="main">
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="hero__media">
+      <section class="hero" aria-labelledby="hero-title" data-hero>
+        <div class="hero__media" data-hero-media>
           <Image
             src={keyArt}
             alt="Фирменный кадр студии HOLLYWOOD CAR DETAILING"
@@ -279,10 +287,20 @@ const jsonLd = {
             fetchpriority="high"
             quality={88}
           />
-          <div class="hero__veil" aria-hidden="true"></div>
+          <div class="hero__veil" data-hero-veil aria-hidden="true"></div>
+          <div class="hero__light" aria-hidden="true"></div>
+          <div class="hero__grain" aria-hidden="true"></div>
         </div>
         <div class="hero__copy">
-          <p class="hero__brand" id="hero-title">HOLLYWOOD</p>
+          <p class="hero__brand" id="hero-title" aria-label="HOLLYWOOD">
+            {
+              brandLetters.map((ch, i) => (
+                <span class="hero__brand-char" style={`--i:${i}`} aria-hidden="true">
+                  {ch}
+                </span>
+              ))
+            }
+          </p>
           <p class="hero__tag">Детейлинг и тюнинг в Ярославле</p>
           <p class="hero__lead">
             Оклейка, полировка, химчистка, свет и автозвук — в одной студии.
@@ -302,6 +320,10 @@ const jsonLd = {
           <span aria-hidden="true">·</span>
           <span>{hours}</span>
         </p>
+        <div class="hero__scroll" aria-hidden="true">
+          <span>Scroll</span>
+          <span class="hero__scroll-line"></span>
+        </div>
       </section>
 
       <section class="departments" id="departments" aria-labelledby="dept-title">
@@ -322,20 +344,35 @@ const jsonLd = {
         </ul>
       </section>
 
+      <aside class="reel" aria-hidden="true">
+        <div class="reel__track" data-reel>
+          <Image
+            src={audiThree}
+            alt=""
+            widths={[960, 1400, 1920, 2560]}
+            sizes="100vw"
+            loading="lazy"
+            quality={84}
+          />
+        </div>
+        <div class="reel__veil"></div>
+        <p class="reel__mark">HOLLYWOOD</p>
+      </aside>
+
       <section class="takes" id="takes" aria-labelledby="takes-title">
         <div class="section-head">
           <h2 id="takes-title">Работы</h2>
-          <p>Фото из профиля студии.</p>
+          <p>Кадры из бокса. Наведите — блик следует за курсором.</p>
         </div>
-        <div class="takes__grid">
+        <div class="takes__stage" data-spotlight>
           {
             takes.map((take) => (
-              <figure class="take">
+              <figure class={`take take--${take.frame}`} tabindex="0">
                 <Image
                   src={take.image}
                   alt={take.alt}
                   widths={[480, 720, 960, 1280, 1600, 1920]}
-                  sizes="(max-width: 700px) 100vw, 33vw"
+                  sizes="(max-width: 700px) 100vw, (max-width: 980px) 50vw, 55vw"
                   loading="lazy"
                   quality={86}
                 />
@@ -522,6 +559,7 @@ const jsonLd = {
 
     <script>
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
       /* Mobile nav */
       const toggle = document.querySelector("[data-nav-toggle]");
@@ -540,6 +578,86 @@ const jsonLd = {
         });
       }
 
+      /* Sticky header accent */
+      const header = document.querySelector(".site-header");
+      const onHeaderScroll = () => {
+        if (!(header instanceof HTMLElement)) return;
+        header.classList.toggle("is-scrolled", window.scrollY > 24);
+      };
+      onHeaderScroll();
+      window.addEventListener("scroll", onHeaderScroll, { passive: true });
+
+      /* Cinematic hero + reel parallax */
+      const heroMedia = document.querySelector("[data-hero-media]");
+      const heroVeil = document.querySelector("[data-hero-veil]");
+      const reelTrack = document.querySelector("[data-reel]");
+      if (!reduceMotion && (heroMedia instanceof HTMLElement || reelTrack instanceof HTMLElement)) {
+        let ticking = false;
+        const updateParallax = () => {
+          const y = window.scrollY;
+          if (heroMedia instanceof HTMLElement) {
+            const heroShift = Math.min(y, window.innerHeight) * 0.28;
+            heroMedia.style.transform = `translate3d(0, ${heroShift}px, 0)`;
+            if (heroVeil instanceof HTMLElement) {
+              heroVeil.style.opacity = String(Math.min(1, 0.85 + y / 1800));
+              heroVeil.style.transform = `translate3d(0, ${Math.min(y, window.innerHeight) * 0.08}px, 0)`;
+            }
+          }
+          if (reelTrack instanceof HTMLElement) {
+            const rect = reelTrack.parentElement?.getBoundingClientRect();
+            if (rect) {
+              const progress = (window.innerHeight - rect.top) / (window.innerHeight + rect.height);
+              const clamped = Math.max(0, Math.min(1, progress));
+              reelTrack.style.transform = `translate3d(0, ${(clamped - 0.5) * 48}px, 0)`;
+            }
+          }
+          ticking = false;
+        };
+        window.addEventListener(
+          "scroll",
+          () => {
+            if (!ticking) {
+              ticking = true;
+              requestAnimationFrame(updateParallax);
+            }
+          },
+          { passive: true },
+        );
+        updateParallax();
+      }
+
+      /* Gallery cursor spotlight */
+      const stage = document.querySelector("[data-spotlight]");
+      if (stage instanceof HTMLElement) {
+        const figures = Array.from(stage.querySelectorAll(".take"));
+        if (finePointer && !reduceMotion) {
+          stage.addEventListener("pointermove", (event) => {
+            if (!(event.target instanceof Element)) return;
+            const figure = event.target.closest(".take");
+            if (!(figure instanceof HTMLElement)) return;
+            const rect = figure.getBoundingClientRect();
+            const x = ((event.clientX - rect.left) / rect.width) * 100;
+            const y = ((event.clientY - rect.top) / rect.height) * 100;
+            figure.style.setProperty("--spot-x", `${x}%`);
+            figure.style.setProperty("--spot-y", `${y}%`);
+          });
+          figures.forEach((figure) => {
+            figure.addEventListener("pointerenter", () => figure.classList.add("is-lit"));
+            figure.addEventListener("pointerleave", () => figure.classList.remove("is-lit"));
+          });
+        } else if (!reduceMotion && "IntersectionObserver" in window) {
+          const lit = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                entry.target.classList.toggle("is-lit", entry.isIntersecting && entry.intersectionRatio > 0.45);
+              });
+            },
+            { threshold: [0.45, 0.7] },
+          );
+          figures.forEach((figure) => lit.observe(figure));
+        }
+      }
+
       /* Scroll reveals */
       if (!reduceMotion && "IntersectionObserver" in window) {
         const io = new IntersectionObserver(
@@ -554,11 +672,20 @@ const jsonLd = {
           { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
         );
         document
-          .querySelectorAll(".dept, .take, .process__list li, .voices__list li, .section-head")
+          .querySelectorAll(".dept, .take, .process__list li, .voices__list li, .section-head, .build__intro")
           .forEach((el) => {
             el.classList.add("will-in");
             io.observe(el);
           });
+        document.querySelectorAll(".dept").forEach((el, i) => {
+          if (el instanceof HTMLElement) el.style.setProperty("--d", `${i * 55}ms`);
+        });
+        document.querySelectorAll(".take").forEach((el, i) => {
+          if (el instanceof HTMLElement) el.style.setProperty("--d", `${i * 65}ms`);
+        });
+        document.querySelectorAll(".process__list li, .voices__list li").forEach((el, i) => {
+          if (el instanceof HTMLElement) el.style.setProperty("--d", `${i * 70}ms`);
+        });
       }
 
       /* Заявка → WhatsApp */
