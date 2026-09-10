@@ -295,34 +295,7 @@ const jsonLd = {
         </ul>
       </section>
 
-      <SignatureViewer />
-
-      <section class="prices" id="prices" aria-labelledby="prices-title">
-        <div class="section-head">
-          <p class="kicker">Прайс</p>
-          <h2 id="prices-title">Цены</h2>
-          <p>
-            Стартовые цены из карточки на Яндекс Картах. Точную сумму скажем после осмотра
-            автомобиля.
-          </p>
-        </div>
-        <ul class="price-list" aria-label="Прайс услуг">
-          {
-            priceList.map((row) => (
-              <li class="price-list__row" id={row.id}>
-                <span class="price-list__name">{row.title}</span>
-                <span class="price-list__sum">{row.price}</span>
-              </li>
-            ))
-          }
-        </ul>
-        <div class="prices__cta">
-          <p>Не нашли нужную услугу — напишите, подскажем по вашему авто.</p>
-          <a class="btn btn--solid" href={waHref} target="_blank" rel="noopener noreferrer"
-            >Уточнить в WhatsApp</a
-          >
-        </div>
-      </section>
+      <SignatureViewer prices={priceList} waHref={waHref} />
 
       <section class="portfolio" id="works" aria-labelledby="works-title">
         <div class="section-head">

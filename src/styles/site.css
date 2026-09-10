@@ -559,13 +559,24 @@ a:hover {
   align-items: baseline;
   justify-content: space-between;
   gap: 0.35rem 1.5rem;
-  padding: 1rem 0;
+  padding: 0.85rem 0.65rem 0.85rem 0.75rem;
   border-bottom: 1px solid var(--line);
+  cursor: default;
+  outline: none;
+  transition:
+    background 0.35s var(--ease),
+    box-shadow 0.35s var(--ease),
+    padding-left 0.35s var(--ease);
+}
+
+.price-list__row:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
 }
 
 .price-list__name {
   font-family: var(--font-display);
-  font-size: 1.25rem;
+  font-size: 1.05rem;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--snow);
@@ -573,20 +584,20 @@ a:hover {
 
 .price-list__sum {
   font-family: var(--font-body);
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--red);
   white-space: nowrap;
 }
 
 .price-list__row.is-lit {
-  background: linear-gradient(90deg, rgba(200, 16, 46, 0.12), transparent 70%);
+  background: linear-gradient(90deg, rgba(200, 16, 46, 0.14), transparent 75%);
   box-shadow: inset 3px 0 0 var(--red);
-  padding-left: 0.75rem;
-  transition:
-    background 0.35s var(--ease),
-    box-shadow 0.35s var(--ease),
-    padding-left 0.35s var(--ease);
+  padding-left: 0.95rem;
+}
+
+.price-list__row:hover {
+  background: linear-gradient(90deg, rgba(200, 16, 46, 0.08), transparent 70%);
 }
 
 .prices__cta {
@@ -618,14 +629,14 @@ a:hover {
   margin-inline: auto;
   display: grid;
   gap: 1.5rem;
-  align-items: stretch;
+  align-items: start;
 }
 
 @media (min-width: 960px) {
   .signature__wrap {
-    grid-template-columns: minmax(0, 1.55fr) minmax(240px, 0.7fr);
+    grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.85fr);
     gap: 2rem;
-    align-items: center;
+    align-items: start;
   }
 }
 
@@ -633,11 +644,11 @@ a:hover {
   position: relative;
   isolation: isolate;
   background:
-    radial-gradient(ellipse 70% 45% at 50% 72%, rgba(200, 16, 46, 0.1), transparent 70%),
-    linear-gradient(180deg, #101014 0%, #0b0b0c 100%);
+    radial-gradient(ellipse 70% 45% at 50% 78%, rgba(200, 16, 46, 0.1), transparent 70%),
+    linear-gradient(180deg, #121218 0%, #0b0b0c 100%);
   border: 1px solid var(--line);
-  padding: clamp(1rem, 3vw, 1.75rem) clamp(0.5rem, 2vw, 1rem) 2.5rem;
-  min-height: 280px;
+  padding: clamp(1rem, 3vw, 1.75rem) clamp(0.5rem, 2vw, 1rem) 2.25rem;
+  min-height: 260px;
 }
 
 .signature__svg {
@@ -676,7 +687,7 @@ a:hover {
 .signature__details circle {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
-  opacity: 0.55;
+  opacity: 0.62;
 }
 
 .signature.is-drawing .signature__details path,
@@ -848,20 +859,31 @@ a:hover {
   color: var(--snow);
 }
 
-.signature__panel {
+/* Side price panel */
+.signature__prices {
   border-top: 2px solid var(--red);
-  padding: 1.25rem 0 0;
-  display: grid;
-  gap: 0.45rem;
-  align-content: start;
+  padding: 1.1rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  min-height: 0;
 }
 
 @media (min-width: 960px) {
-  .signature__panel {
+  .signature__prices {
+    position: sticky;
+    top: 5.5rem;
     border-top: 0;
     border-left: 2px solid var(--red);
-    padding: 0.25rem 0 0.25rem 1.35rem;
+    padding: 0.15rem 0 0.25rem 1.25rem;
+    max-height: calc(100vh - 6.5rem);
   }
+}
+
+.signature__prices-head {
+  display: grid;
+  gap: 0.35rem;
+  flex-shrink: 0;
 }
 
 .signature__panel-kicker {
@@ -873,10 +895,10 @@ a:hover {
   font-weight: 700;
 }
 
-.signature__panel-title {
+.signature__prices-title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.45rem, 3vw, 1.9rem);
+  font-size: clamp(1.45rem, 3vw, 1.85rem);
   font-weight: 400;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -884,38 +906,59 @@ a:hover {
   line-height: 1.05;
 }
 
-.signature__panel-price {
-  margin: 0.15rem 0 0;
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--red);
-  min-height: 1.4em;
-}
-
-.signature__panel-detail {
-  margin: 0.25rem 0 0;
+.signature__prices-lead {
+  margin: 0;
   color: var(--mute);
-  font-size: 0.94rem;
-  max-width: 28rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
 }
 
-.signature__panel-link {
-  margin-top: 0.85rem;
-  justify-self: start;
-  color: var(--snow);
-  font-weight: 600;
-  font-size: 0.92rem;
-  text-decoration: none;
-  border-bottom: 1px solid var(--line-strong);
-  padding-bottom: 0.15rem;
+.signature__price-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(200, 16, 46, 0.45) transparent;
 }
 
-.signature__panel-link:hover {
-  border-bottom-color: var(--snow);
+@media (min-width: 960px) {
+  .signature__price-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+  }
 }
 
-.signature__panel-link[hidden] {
-  display: none;
+@media (max-width: 959px) {
+  .signature__price-list {
+    max-height: min(52vh, 420px);
+  }
+}
+
+.signature__price-list .price-list__row {
+  width: 100%;
+}
+
+.signature__prices-cta {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--line);
+}
+
+.signature__prices-cta p {
+  margin: 0;
+  color: var(--mute);
+  font-size: 0.86rem;
+  max-width: 16rem;
 }
 
 .signature__note {
