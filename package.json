@@ -19,10 +19,12 @@
   "license": "UNLICENSED",
   "type": "module",
   "dependencies": {
-    "astro": "^7.3.2"
+    "astro": "^7.3.2",
+    "three": "^0.186.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@types/three": "^0.185.4",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^1.0.0",
     "sharp": "^0.35.4",

@@ -43,10 +43,12 @@ html {
     animation: none !important;
   }
 
-  .signature__stroke,
-  .signature__details path,
-  .signature__details circle {
-    stroke-dashoffset: 0 !important;
+  .signature__canvas {
+    opacity: 1 !important;
+    transition: none !important;
+  }
+
+  .signature__dot-ring {
     animation: none !important;
   }
 }
@@ -648,80 +650,21 @@ a:hover {
     linear-gradient(180deg, #121218 0%, #0b0b0c 100%);
   border: 1px solid var(--line);
   padding: clamp(1rem, 3vw, 1.75rem) clamp(0.5rem, 2vw, 1rem) 2.25rem;
-  min-height: 260px;
+  min-height: clamp(260px, 42vw, 380px);
+  aspect-ratio: 16 / 9;
 }
 
-.signature__svg {
+.signature__canvas {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
-.signature__fill {
+  height: 100%;
   opacity: 0;
-  transition: opacity 0.9s var(--ease) 0.15s;
+  transition: opacity 0.7s var(--ease);
 }
 
-.signature.is-drawn .signature__fill {
-  opacity: 1;
-}
-
-.signature__stroke {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  filter: drop-shadow(0 0 6px rgba(244, 241, 234, 0.25));
-}
-
-.signature.is-drawing .signature__stroke {
-  animation: sig-draw 2.4s var(--ease) forwards;
-}
-
-.signature.is-drawn .signature__stroke,
-.signature.is-instant .signature__stroke {
-  stroke-dashoffset: 0;
-  animation: none;
-}
-
-.signature__details path,
-.signature__details circle {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  opacity: 0.62;
-}
-
-.signature.is-drawing .signature__details path,
-.signature.is-drawing .signature__details circle {
-  animation: sig-draw 1.8s var(--ease) 0.55s forwards;
-}
-
-.signature.is-drawn .signature__details path,
-.signature.is-drawn .signature__details circle,
-.signature.is-instant .signature__details path,
-.signature.is-instant .signature__details circle {
-  stroke-dashoffset: 0;
-  animation: none;
-}
-
-@keyframes sig-draw {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-.signature__anchor {
-  opacity: 0;
-  transform-origin: center;
-  transition:
-    opacity 0.4s var(--ease),
-    r 0.25s var(--ease);
-}
-
-.signature.is-ready .signature__anchor {
-  opacity: 0.85;
-}
-
-.signature__anchor.is-active {
+.signature.is-ready .signature__canvas {
   opacity: 1;
 }
 
@@ -971,15 +914,9 @@ a:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .signature__stroke,
-  .signature__details path,
-  .signature__details circle {
-    stroke-dashoffset: 0 !important;
-    animation: none !important;
-  }
-
-  .signature__fill {
+  .signature__canvas {
     opacity: 1 !important;
+    transition: none !important;
   }
 
   .signature__hot {

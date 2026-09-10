@@ -1,12 +1,4 @@
 ---
-/**
- * Interactive Signature Viewer — side-profile sports sedan.
- * Original SVG traced to BMW M5 Competition (F90) side proportions:
- * long hood, Hofmeister kink, aggressive bumper, large wheel arches.
- * No BMW roundel / trademark lettering — kidney silhouette shape only.
- * Artwork: original for this site (all rights reserved for the SVG).
- */
-
 interface PriceRow {
   id: string;
   title: string;
@@ -19,6 +11,7 @@ interface Props {
 }
 
 const { prices, waHref } = Astro.props;
+const modelUrl = `${import.meta.env.BASE_URL}models/car.glb`;
 
 const zones = [
   {
@@ -117,259 +110,29 @@ for (const z of zones) {
 }
 ---
 
-<section class="signature" id="signature" aria-labelledby="signature-title" data-signature>
+<section
+  class="signature"
+  id="signature"
+  aria-labelledby="signature-title"
+  data-signature
+  data-model-url={modelUrl}
+>
   <div class="section-head">
     <p class="kicker">Зоны авто</p>
     <h2 id="signature-title">Что можно сделать с авто</h2>
     <p>
-      Наведите на зону кузова — прайс справа подсветит и прокрутит нужную строку. Силуэт
-      спортивного седана по пропорциям M5 Competition (F90).
+      Наведите на зону кузова — прайс справа подсветит и прокрутит нужную строку. 3D-модель
+      спортивного седана в студийном свете.
     </p>
   </div>
 
   <div class="signature__wrap">
     <div class="signature__stage" data-sig-stage>
-      <svg
-        class="signature__svg"
-        viewBox="0 0 1280 460"
-        role="img"
-        aria-label="Боковой силуэт спортивного седана в пропорциях BMW M5 Competition"
-        data-sig-svg
-      >
-        <defs>
-          <linearGradient id="sig-body" x1="8%" y1="20%" x2="92%" y2="90%">
-            <stop offset="0%" stop-color="#2e2e34" />
-            <stop offset="32%" stop-color="#1c1c22" />
-            <stop offset="68%" stop-color="#121216" />
-            <stop offset="100%" stop-color="#0a0a0c" />
-          </linearGradient>
-          <linearGradient id="sig-shine" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#f4f1ea" stop-opacity="0.2" />
-            <stop offset="40%" stop-color="#f4f1ea" stop-opacity="0.05" />
-            <stop offset="100%" stop-color="#f4f1ea" stop-opacity="0" />
-          </linearGradient>
-          <linearGradient id="sig-glass" x1="0%" y1="0%" x2="20%" y2="100%">
-            <stop offset="0%" stop-color="#9aadb8" stop-opacity="0.42" />
-            <stop offset="55%" stop-color="#4a5560" stop-opacity="0.28" />
-            <stop offset="100%" stop-color="#2a3238" stop-opacity="0.18" />
-          </linearGradient>
-          <linearGradient id="sig-ground" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#c8102e" stop-opacity="0.2" />
-            <stop offset="100%" stop-color="#c8102e" stop-opacity="0" />
-          </linearGradient>
-        </defs>
-
-        <ellipse class="signature__ground" cx="640" cy="412" rx="500" ry="14" fill="url(#sig-ground)" />
-
-        <!-- Body fill — F90-inspired sports sedan proportions -->
-        <g class="signature__fill" data-sig-fill aria-hidden="true">
-          <path
-            fill="url(#sig-body)"
-            d="M64 318
-              L72 298
-              L88 278
-              L108 262
-              L148 242
-              L198 222
-              L258 204
-              L318 190
-              L348 168
-              L392 142
-              L448 122
-              L520 108
-              L600 104
-              L680 112
-              L748 132
-              L800 158
-              L848 188
-              L900 220
-              L960 250
-              L1016 274
-              L1072 296
-              L1116 318
-              L1138 338
-              L1142 356
-              L1128 368
-              L1060 372
-              C1044 332 1010 306 964 306
-              C918 306 884 332 868 372
-              L392 376
-              C376 336 342 310 296 310
-              C250 310 216 336 200 376
-              L118 372
-              L96 358
-              L78 348
-              L66 338
-              Z"
-          />
-          <path
-            fill="url(#sig-shine)"
-            d="M148 242
-              L258 204
-              L348 168
-              L448 122
-              L600 104
-              L748 132
-              L848 188
-              L800 168
-              L680 128
-              L520 122
-              L400 148
-              L318 180
-              L220 214
-              Z"
-          />
-          <path
-            fill="url(#sig-glass)"
-            d="M352 172
-              L400 140
-              L468 118
-              L560 110
-              L650 116
-              L730 136
-              L792 168
-              L768 182
-              L700 154
-              L600 142
-              L510 146
-              L430 164
-              L378 182
-              Z"
-          />
-        </g>
-
-        <!-- Primary outer silhouette -->
-        <path
-          class="signature__stroke"
-          data-sig-stroke
-          fill="none"
-          stroke="#f4f1ea"
-          stroke-width="1.9"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          pathLength="1"
-          d="M66 320
-            L74 300
-            L90 280
-            L110 264
-            L150 244
-            L200 224
-            L260 206
-            L320 192
-            L350 170
-            L394 144
-            L450 124
-            L522 110
-            L602 106
-            L682 114
-            L750 134
-            L802 160
-            L850 190
-            L902 222
-            L962 252
-            L1018 276
-            L1074 298
-            L1118 320
-            L1140 340
-            L1144 358
-            L1130 370
-            L1062 374
-            C1046 334 1012 308 966 308
-            C920 308 886 334 870 374
-            L394 378
-            C378 338 344 312 298 312
-            C252 312 218 338 202 378
-            L120 374
-            L98 360
-            L80 350
-            L68 340
-            Z"
-        />
-
-        <!-- Character / detail strokes -->
-        <g
-          class="signature__details"
-          data-sig-details
-          fill="none"
-          stroke="#c8c6c0"
-          stroke-width="1.05"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path pathLength="1" d="M160 256 L280 220 L420 198 L580 192 L760 204 L980 258 L1080 298" />
-          <path pathLength="1" d="M160 358 L220 364 L392 368 L870 366 L1040 358" />
-          <path pathLength="1" d="M260 206 L320 192 L348 176" />
-          <path
-            pathLength="1"
-            d="M354 174 L402 142 L470 120 L560 112 L650 118 L728 138 L790 170 L766 184 L698 156 L600 144 L512 148 L432 166 L380 184 Z"
-          />
-          <path pathLength="1" d="M568 144 L566 180" />
-          <path pathLength="1" d="M650 118 L710 140 L766 184" />
-          <path pathLength="1" d="M456 186 L448 350" />
-          <path pathLength="1" d="M620 176 L616 352" />
-          <path pathLength="1" d="M500 236 L528 234" />
-          <path pathLength="1" d="M660 232 L688 230" />
-          <path
-            pathLength="1"
-            d="M360 186 C344 172 324 170 310 178 C300 186 304 200 318 206 L356 210 C364 202 366 192 360 186"
-          />
-          <path pathLength="1" d="M356 204 L382 212" />
-          <path
-            pathLength="1"
-            d="M96 286 L118 268 L168 252 L178 256 L172 278 L148 288 L118 294 Z"
-          />
-          <path pathLength="1" d="M118 272 L158 258" />
-          <path pathLength="1" d="M72 308 L96 292 L118 286" />
-          <path pathLength="1" d="M74 320 L100 306 L124 300" />
-          <path pathLength="1" d="M76 332 L102 320 L126 316" />
-          <path pathLength="1" d="M88 348 L130 334 L178 330 L210 334" />
-          <path pathLength="1" d="M100 356 L140 346" />
-          <path pathLength="1" d="M368 248 L392 242 L408 250" />
-          <path pathLength="1" d="M370 258 L396 252 L412 260" />
-          <path pathLength="1" d="M1088 300 L1124 318 L1134 340 L1108 346 L1084 330 Z" />
-          <path pathLength="1" d="M850 190 L910 228 L1000 270 L1070 296" />
-          <path pathLength="1" d="M800 158 L848 154 L870 168" />
-          <circle pathLength="1" cx="1096" cy="366" r="5.5" />
-          <circle pathLength="1" cx="1116" cy="366" r="5.5" />
-          <path pathLength="1" d="M440 122 L560 110 L680 116 L740 132" />
-          <circle pathLength="1" cx="298" cy="348" r="58" />
-          <circle pathLength="1" cx="298" cy="348" r="44" />
-          <circle pathLength="1" cx="298" cy="348" r="15" />
-          <path
-            pathLength="1"
-            d="M298 304 L298 392 M254 348 L342 348
-               M268 318 L328 378 M268 378 L328 318
-               M280 308 L316 388 M280 388 L316 308"
-          />
-          <path pathLength="1" d="M220 340 C236 292 266 268 298 268 C330 268 360 292 376 340" />
-          <circle pathLength="1" cx="966" cy="348" r="58" />
-          <circle pathLength="1" cx="966" cy="348" r="44" />
-          <circle pathLength="1" cx="966" cy="348" r="15" />
-          <path
-            pathLength="1"
-            d="M966 304 L966 392 M922 348 L1010 348
-               M936 318 L996 378 M936 378 L996 318
-               M948 308 L984 388 M948 388 L984 308"
-          />
-          <path pathLength="1" d="M888 340 C904 292 934 268 966 268 C998 268 1028 292 1044 340" />
-        </g>
-
-        <g class="signature__anchors" aria-hidden="true">
-          {
-            zones.map((z) => (
-              <circle
-                class="signature__anchor"
-                data-sig-anchor={z.id}
-                cx={(z.x / 100) * 1280}
-                cy={(z.y / 100) * 460}
-                r="4.5"
-                fill="#c8102e"
-              />
-            ))
-          }
-        </g>
-      </svg>
+      <canvas
+        class="signature__canvas"
+        data-sig-canvas
+        aria-label="3D-модель спортивного седана — зоны услуг детейлинга"
+      ></canvas>
 
       <ul class="signature__hotspots" data-sig-hotspots>
         {
@@ -431,247 +194,13 @@ for (const z of zones) {
   </div>
 
   <p class="signature__note">
-    Иллюстрация: оригинальный SVG по боковым пропорциям BMW M5 Competition F90 (без логотипов и
-    товарных знаков). Цены — из карточки на Яндекс Картах.
+    3D-модель: Kenney Car Kit «sedan-sports» (CC0). Цены — из карточки на Яндекс Картах.
   </p>
 </section>
 
 <script>
+  import { initSignatureViewer } from "../scripts/signature-viewer";
+
   const root = document.querySelector("[data-signature]");
-  if (root instanceof HTMLElement) {
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const stage = root.querySelector("[data-sig-stage]");
-    const stroke = root.querySelector("[data-sig-stroke]");
-    const priceList = root.querySelector("[data-sig-price-list]");
-    const buttons = Array.from(root.querySelectorAll("[data-sig-hot]"));
-    const priceRows = Array.from(root.querySelectorAll("[data-sig-price-row]"));
-
-    const zoneData: Record<
-      string,
-      { label: string; title: string; price: string; detail: string; priceIds: string[] }
-    > = {
-      optics: {
-        label: "Оптика",
-        title: "Bi-LED линзы и полировка фар",
-        price: "от 12 000 ₽",
-        detail: "Bi-LED от 12 000 ₽ · полировка фар от 3 500 ₽",
-        priceIds: ["price-biled", "price-headlights"],
-      },
-      ppf: {
-        label: "Защита",
-        title: "Оклейка бронеплёнкой",
-        price: "от 12 000 ₽",
-        detail: "Капот, бампер, крылья, зоны риска сколов",
-        priceIds: ["price-ppf"],
-      },
-      paint: {
-        label: "Кузов",
-        title: "Полировка кузова",
-        price: "от 14 000 ₽",
-        detail: "Лёгкая и глубокая — глубина цвета и блеск ЛКП",
-        priceIds: ["price-polish"],
-      },
-      ceramic: {
-        label: "Керамика",
-        title: "Керамика и жидкое стекло",
-        price: "от 18 900 ₽",
-        detail: "Керамика от 18 900 ₽ · жидкое стекло от 5 000 ₽",
-        priceIds: ["price-ceramic", "price-glasscoat"],
-      },
-      interior: {
-        label: "Салон",
-        title: "Химчистка салона",
-        price: "уточняйте",
-        detail: "Глубокая чистка — объём после осмотра",
-        priceIds: ["price-interior"],
-      },
-      sound: {
-        label: "Звук",
-        title: "Автозвук / магнитола",
-        price: "от 6 000 ₽",
-        detail: "От замены магнитолы до соревновательного уровня",
-        priceIds: ["price-audio"],
-      },
-      noise: {
-        label: "Шумоизоляция",
-        title: "Шумоизоляция",
-        price: "от 6 000 ₽",
-        detail: "Двери, пол, арки — тише в салоне",
-        priceIds: ["price-noise"],
-      },
-      rear: {
-        label: "Антикор",
-        title: "Антикор",
-        price: "от 20 000 ₽",
-        detail: "Обработка днища и скрытых полостей",
-        priceIds: ["price-anticor"],
-      },
-    };
-
-    let drawn = false;
-
-    const clearPriceHighlight = () => {
-      priceRows.forEach((el) => el.classList.remove("is-lit"));
-    };
-
-    const setHotActive = (id: string | null) => {
-      buttons.forEach((btn) => {
-        const on = id !== null && btn.getAttribute("data-sig-hot") === id;
-        btn.classList.toggle("is-active", on);
-        btn.setAttribute("aria-expanded", String(on));
-        const li = btn.closest(".signature__hot");
-        if (li) li.classList.toggle("is-active", on);
-      });
-      root.querySelectorAll("[data-sig-anchor]").forEach((el) => {
-        el.classList.toggle("is-active", id !== null && el.getAttribute("data-sig-anchor") === id);
-      });
-    };
-
-    const scrollPriceTo = (priceIds: string[]) => {
-      const primary = priceIds[0];
-      if (!primary) return;
-      const first = document.getElementById(primary);
-      if (!(first instanceof HTMLElement)) return;
-
-      if (priceList instanceof HTMLElement && priceList.scrollHeight > priceList.clientHeight + 8) {
-        const rowRect = first.getBoundingClientRect();
-        const listRect = priceList.getBoundingClientRect();
-        const delta =
-          rowRect.top - listRect.top - priceList.clientHeight / 2 + rowRect.height / 2;
-        priceList.scrollBy({
-          top: delta,
-          behavior: reduceMotion ? "auto" : "smooth",
-        });
-      } else {
-        first.scrollIntoView({
-          behavior: reduceMotion ? "auto" : "smooth",
-          block: "nearest",
-          inline: "nearest",
-        });
-      }
-    };
-
-    const activate = (id: string, opts: { scrollPrices?: boolean; fromPrice?: boolean } = {}) => {
-      const data = zoneData[id];
-      if (!data) return;
-      setHotActive(id);
-      clearPriceHighlight();
-      data.priceIds.forEach((pid) => {
-        const row = document.getElementById(pid);
-        if (row) row.classList.add("is-lit");
-      });
-      if (opts.scrollPrices !== false) scrollPriceTo(data.priceIds);
-    };
-
-    const activateFromPrice = (priceId: string) => {
-      const row = document.getElementById(priceId);
-      const zoneId = row?.getAttribute("data-zone");
-      clearPriceHighlight();
-      if (row) row.classList.add("is-lit");
-      if (zoneId && zoneData[zoneId]) {
-        zoneData[zoneId].priceIds.forEach((pid) => {
-          document.getElementById(pid)?.classList.add("is-lit");
-        });
-        setHotActive(zoneId);
-      } else {
-        setHotActive(null);
-      }
-    };
-
-    const revealHotspots = () => {
-      root.classList.add("is-ready");
-    };
-
-    const finishDraw = () => {
-      if (drawn) return;
-      drawn = true;
-      root.classList.add("is-drawn");
-      revealHotspots();
-    };
-
-    const playDraw = () => {
-      if (drawn || reduceMotion) {
-        root.classList.add("is-drawn", "is-instant");
-        finishDraw();
-        return;
-      }
-      root.classList.add("is-drawing");
-      const onEnd = (e: Event) => {
-        if (e.target !== stroke) return;
-        stroke?.removeEventListener("animationend", onEnd);
-        finishDraw();
-      };
-      stroke?.addEventListener("animationend", onEnd);
-      window.setTimeout(finishDraw, 3200);
-    };
-
-    if (reduceMotion) {
-      root.classList.add("is-drawn", "is-instant", "is-ready");
-      drawn = true;
-    } else if ("IntersectionObserver" in window && stage) {
-      const io = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              playDraw();
-              io.disconnect();
-            }
-          });
-        },
-        { threshold: 0.28, rootMargin: "0px 0px -8% 0px" },
-      );
-      io.observe(stage);
-    } else {
-      playDraw();
-    }
-
-    const onHotEnter = (id: string) => {
-      if (!drawn) finishDraw();
-      activate(id, { scrollPrices: true });
-    };
-
-    buttons.forEach((btn) => {
-      btn.addEventListener("mouseenter", () => {
-        const id = btn.getAttribute("data-sig-hot");
-        if (id) onHotEnter(id);
-      });
-      btn.addEventListener("focus", () => {
-        const id = btn.getAttribute("data-sig-hot");
-        if (id) onHotEnter(id);
-      });
-      btn.addEventListener("click", () => {
-        const id = btn.getAttribute("data-sig-hot");
-        if (id) onHotEnter(id);
-      });
-    });
-
-    priceRows.forEach((row) => {
-      const priceId = row.getAttribute("data-sig-price-row");
-      if (!priceId) return;
-      const highlight = () => {
-        if (!drawn) finishDraw();
-        activateFromPrice(priceId);
-      };
-      row.addEventListener("mouseenter", highlight);
-      row.addEventListener("focus", highlight);
-    });
-
-    root.addEventListener("keydown", (e) => {
-      if (!(e.target instanceof HTMLElement)) return;
-      if (!e.target.matches("[data-sig-hot]")) return;
-      const ids = buttons.map((b) => b.getAttribute("data-sig-hot")).filter(Boolean) as string[];
-      const cur = e.target.getAttribute("data-sig-hot");
-      if (!cur) return;
-      const idx = ids.indexOf(cur);
-      if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-        e.preventDefault();
-        const next = buttons[(idx + 1) % buttons.length];
-        if (next instanceof HTMLElement) next.focus();
-      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-        e.preventDefault();
-        const prev = buttons[(idx - 1 + buttons.length) % buttons.length];
-        if (prev instanceof HTMLElement) prev.focus();
-      }
-    });
-  }
+  if (root instanceof HTMLElement) initSignatureViewer(root);
 </script>
