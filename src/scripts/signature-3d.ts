@@ -7,6 +7,8 @@ import type {
   Mesh,
   LineSegments,
   Vector3,
+  MeshStandardMaterial,
+  LineBasicMaterial,
 } from "three";
 
 export type SigZone3D = {
@@ -15,11 +17,7 @@ export type SigZone3D = {
   subtitle: string;
   price: string;
   priceId: string;
-  /**
-   * Normalized position inside the fitted car AABB (0..1 each axis).
-   * x: 0 left → 1 right, y: 0 bottom → 1 top, z: 0 rear → 1 front
-   * (in model local space BEFORE yaw; yaw is applied on the car root)
-   */
+  /** Normalized AABB: u left→right, v bottom→top, w rear→front */
   uvw: [number, number, number];
   side: "left" | "right" | "top" | "bottom";
   labelBias: [number, number];
@@ -29,6 +27,7 @@ type ThreeMod = typeof import("three");
 
 const GOLD_BRIGHT = 0xe4c06a;
 const EDGE = 0xd8d4cc;
+const REVEAL_MS = 1400;
 
 function clamp(n: number, min = 0, max = 1) {
   return Math.min(max, Math.max(min, n));
@@ -66,9 +65,19 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
   let carRoot: Group | null = null;
   let edgeGroup: Group | null = null;
   let markerRoot: Group | null = null;
-  let alive = false;
+  let fillMat: MeshStandardMaterial | null = null;
+  let lineMat: LineBasicMaterial | null = null;
+
+  /** Scene stays loaded after first mount — never unload on scroll away */
+  let mounted = false;
+  let mounting = false;
+  let inView = false;
   let disposed = false;
   let ready = false;
+  let drawDone = false;
+  let drawStarted = false;
+  let revealT0 = 0;
+  let raf = 0;
   let boxSize: Vector3 | null = null;
   let boxMin: Vector3 | null = null;
 
@@ -80,6 +89,35 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     ready = true;
     root.classList.add("is-ready");
     if (reduceMotion) root.classList.add("is-instant");
+  };
+
+  const finishDraw = () => {
+    if (drawDone) return;
+    drawDone = true;
+    applyReveal(1);
+    markReady();
+    root.querySelectorAll<SVGPathElement>("[data-sig-line]").forEach((line, i) => {
+      try {
+        const len = Math.max(line.getTotalLength(), 1);
+        line.style.setProperty("--sig-len", String(len));
+        line.style.strokeDasharray = String(len);
+        line.style.strokeDashoffset = String(len);
+        line.style.animationDelay = `${0.04 + i * 0.05}s`;
+        line.classList.add("is-drawing");
+      } catch {
+        /* skip */
+      }
+    });
+    syncOverlays();
+  };
+
+  const applyReveal = (p: number) => {
+    const t = clamp(p);
+    if (fillMat) fillMat.opacity = 0.55 * t;
+    if (lineMat) {
+      // Keep dim/active behavior after draw; during reveal ramp to base
+      if (!root.classList.contains("is-focused")) lineMat.opacity = 0.88 * t;
+    }
   };
 
   const setActive = (id: string | null) => {
@@ -110,20 +148,14 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
       line.classList.toggle("is-dim", has && !on);
     });
 
-    if (edgeGroup && THREE) {
-      edgeGroup.traverse((o: Object3D) => {
-        const ls = o as LineSegments;
-        if (!(ls as LineSegments).isLineSegments) return;
-        const mat = ls.material as { color?: { setHex: (n: number) => void }; opacity?: number };
-        if (!mat?.color) return;
-        if (!has) {
-          mat.color.setHex(EDGE);
-          mat.opacity = 0.85;
-        } else {
-          mat.color.setHex(GOLD_BRIGHT);
-          mat.opacity = 0.35;
-        }
-      });
+    if (edgeGroup && lineMat) {
+      if (!has) {
+        lineMat.color.setHex(EDGE);
+        lineMat.opacity = drawDone ? 0.88 : lineMat.opacity;
+      } else {
+        lineMat.color.setHex(GOLD_BRIGHT);
+        lineMat.opacity = 0.35;
+      }
     }
   };
 
@@ -167,7 +199,6 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     else setActive(null);
   };
 
-  /** Map normalized uvw → carRoot-local point using fitted AABB (snaps to body, not float-high guesses). */
   const uvwToLocal = (uvw: [number, number, number], THREE: ThreeMod) => {
     if (!boxMin || !boxSize) return new THREE.Vector3();
     const [u, v, w] = uvw;
@@ -180,7 +211,6 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
 
   const projectZone = (z: SigZone3D, THREE: ThreeMod) => {
     if (!camera || !carRoot || !renderer) return null;
-    // Prefer live marker Object3D if present (follows car transform exactly)
     const marker = markerRoot?.getObjectByName(`sig-mark-${z.id}`);
     const v = marker
       ? new THREE.Vector3().setFromMatrixPosition(marker.matrixWorld)
@@ -226,37 +256,36 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     const center = box.getCenter(new THREE.Vector3());
     object.position.sub(center);
     const maxDim = Math.max(size.x, size.y, size.z) || 1;
-    const scale = 2.35 / maxDim;
-    object.scale.setScalar(scale);
-    // Right-side ¾ toward viewer (mirror of prior left-flank pose)
+    object.scale.setScalar(2.35 / maxDim);
+    // Right-side ¾ toward viewer
     object.rotation.y = -Math.PI * 0.34;
     object.updateMatrixWorld(true);
   };
 
   const stylizeAsTechnical = (source: Object3D, THREE: ThreeMod) => {
-    const fillMat = new THREE.MeshStandardMaterial({
+    fillMat = new THREE.MeshStandardMaterial({
       color: 0x121214,
       metalness: 0.55,
       roughness: 0.45,
       transparent: true,
-      opacity: 0.55,
+      opacity: 0,
       flatShading: true,
     });
-    const lineMat = new THREE.LineBasicMaterial({
+    lineMat = new THREE.LineBasicMaterial({
       color: EDGE,
       transparent: true,
-      opacity: 0.88,
+      opacity: 0,
       depthWrite: false,
     });
     const linesRoot = new THREE.Group();
     source.traverse((child: Object3D) => {
       const mesh = child as Mesh;
       if (!mesh.isMesh || !mesh.geometry) return;
-      mesh.material = fillMat;
+      mesh.material = fillMat!;
       mesh.castShadow = false;
       mesh.receiveShadow = false;
       const edges = new THREE.EdgesGeometry(mesh.geometry, 22);
-      const lines = new THREE.LineSegments(edges, lineMat);
+      const lines = new THREE.LineSegments(edges, lineMat!);
       linesRoot.add(lines);
       mesh.updateWorldMatrix(true, false);
       const m = mesh.matrixWorld.clone();
@@ -273,10 +302,8 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     const w = canvasHost.clientWidth || 1;
     const h = canvasHost.clientHeight || 1;
     const aspect = w / h;
-    // Pull back on tall/narrow phones so the car stays centered in frame
     const dist = aspect < 0.9 ? 5.1 : aspect < 1.2 ? 4.55 : 4.15;
     const elev = aspect < 0.9 ? 1.15 : 0.95;
-    // Camera on car's right / front-right — right flank toward viewer
     camera.position.set(-dist * 0.58, elev, dist * 0.82);
     camera.lookAt(0, 0.02, 0);
   };
@@ -285,6 +312,37 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     if (!renderer || !scene || !camera) return;
     renderer.render(scene, camera);
     syncOverlays();
+  };
+
+  const tick = (now: number) => {
+    if (!inView || disposed) {
+      raf = 0;
+      return;
+    }
+    raf = requestAnimationFrame(tick);
+
+    if (!drawDone && drawStarted) {
+      if (reduceMotion) {
+        finishDraw();
+      } else {
+        if (!revealT0) revealT0 = now;
+        const p = clamp((now - revealT0) / REVEAL_MS);
+        applyReveal(p);
+        if (p >= 1) finishDraw();
+      }
+    }
+
+    paint();
+  };
+
+  const startLoop = () => {
+    if (raf || !inView || disposed) return;
+    raf = requestAnimationFrame(tick);
+  };
+
+  const stopLoop = () => {
+    cancelAnimationFrame(raf);
+    raf = 0;
   };
 
   const resize = () => {
@@ -297,11 +355,14 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     frameCamera();
-    paint();
+    if (inView) paint();
   };
 
+  /** Full teardown — only on page leave / HMR, never on scroll-away */
   const disposeScene = () => {
-    alive = false;
+    stopLoop();
+    mounted = false;
+    mounting = false;
     if (renderer) {
       renderer.dispose();
       renderer.forceContextLoss?.();
@@ -315,174 +376,161 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
     carRoot = null;
     edgeGroup = null;
     markerRoot = null;
+    fillMat = null;
+    lineMat = null;
     boxSize = null;
     boxMin = null;
     THREE = null;
   };
 
   const mount = async () => {
-    if (disposed || alive) return;
-    const [three, { GLTFLoader }] = await Promise.all([
-      import("three"),
-      import("three/examples/jsm/loaders/GLTFLoader.js"),
-    ]);
-    if (disposed) return;
-    THREE = three;
+    if (disposed || mounted || mounting) return;
+    mounting = true;
+    try {
+      const [three, { GLTFLoader }] = await Promise.all([
+        import("three"),
+        import("three/examples/jsm/loaders/GLTFLoader.js"),
+      ]);
+      if (disposed) return;
+      THREE = three;
 
-    const scn = new three.Scene();
-    scn.background = new three.Color(0x050506);
-    scn.fog = new three.Fog(0x050506, 7, 16);
-    scene = scn;
+      const scn = new three.Scene();
+      scn.background = new three.Color(0x050506);
+      scn.fog = new three.Fog(0x050506, 7, 16);
+      scene = scn;
 
-    // Fixed ¾ front-right camera — no orbit, no fly-to
-    const cam = new three.PerspectiveCamera(34, 1, 0.1, 40);
-    camera = cam;
-    frameCamera();
+      const cam = new three.PerspectiveCamera(34, 1, 0.1, 40);
+      camera = cam;
+      frameCamera();
 
-    const rend = new three.WebGLRenderer({
-      antialias: true,
-      alpha: false,
-      powerPreference: "high-performance",
-    });
-    rend.setClearColor(0x050506, 1);
-    rend.domElement.className = "signature__canvas";
-    rend.domElement.setAttribute("aria-hidden", "true");
-    canvasHost.appendChild(rend.domElement);
-    renderer = rend;
+      const rend = new three.WebGLRenderer({
+        antialias: true,
+        alpha: false,
+        powerPreference: "high-performance",
+      });
+      rend.setClearColor(0x050506, 1);
+      rend.domElement.className = "signature__canvas";
+      rend.domElement.setAttribute("aria-hidden", "true");
+      canvasHost.appendChild(rend.domElement);
+      renderer = rend;
 
-    const hemi = new three.HemisphereLight(0xf0ece4, 0x1a1a1c, 0.85);
-    scn.add(hemi);
-    const key = new three.DirectionalLight(0xfff2d6, 1.15);
-    key.position.set(3.2, 4.5, 2.2);
-    scn.add(key);
-    const rim = new three.DirectionalLight(0xc9a24a, 0.35);
-    rim.position.set(-2.5, 1.2, -3);
-    scn.add(rim);
+      scn.add(new three.HemisphereLight(0xf0ece4, 0x1a1a1c, 0.85));
+      const key = new three.DirectionalLight(0xfff2d6, 1.15);
+      key.position.set(3.2, 4.5, 2.2);
+      scn.add(key);
+      const rim = new three.DirectionalLight(0xc9a24a, 0.35);
+      rim.position.set(-2.5, 1.2, -3);
+      scn.add(rim);
 
-    const floor = new three.Mesh(
-      new three.CircleGeometry(3.2, 48),
-      new three.MeshBasicMaterial({ color: 0x0a0a0c, transparent: true, opacity: 0.9 }),
-    );
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -0.78;
-    scn.add(floor);
-
-    const loader = new GLTFLoader();
-    const gltf = await loader.loadAsync(modelUrl);
-    if (disposed) return;
-
-    const rootGroup = new three.Group();
-    const model = gltf.scene;
-    fitCar(model, three);
-    model.updateMatrixWorld(true);
-    const edges = stylizeAsTechnical(model, three);
-    model.add(edges);
-    rootGroup.add(model);
-    scn.add(rootGroup);
-    carRoot = rootGroup;
-    edgeGroup = edges;
-
-    // Measure AABB in car-aligned axes (yaw temporarily zeroed), then restore ¾ pose.
-    // Markers live in model-local space so they rotate with the car.
-    const savedYaw = model.rotation.y;
-    model.rotation.y = 0;
-    model.updateMatrixWorld(true);
-    const aligned = new three.Box3().setFromObject(model);
-    const invModel = model.matrixWorld.clone().invert();
-    const localMin = aligned.min.clone().applyMatrix4(invModel);
-    const localMax = aligned.max.clone().applyMatrix4(invModel);
-    boxMin = new three.Vector3(
-      Math.min(localMin.x, localMax.x),
-      Math.min(localMin.y, localMax.y),
-      Math.min(localMin.z, localMax.z),
-    );
-    boxSize = new three.Vector3(
-      Math.abs(localMax.x - localMin.x),
-      Math.abs(localMax.y - localMin.y),
-      Math.abs(localMax.z - localMin.z),
-    );
-    model.rotation.y = savedYaw;
-    model.updateMatrixWorld(true);
-
-    markerRoot = new three.Group();
-    model.add(markerRoot);
-    for (const z of zones) {
-      const mark = new three.Object3D();
-      mark.name = `sig-mark-${z.id}`;
-      // uvw → model-local (car axes): u left→right, v bottom→top, w rear→front
-      // Slight inward bias on v so dots sit on body skin, not AABB lid (mirrors/roof trim)
-      const vBody = clamp(z.uvw[1] * 0.92);
-      mark.position.set(
-        boxMin.x + boxSize.x * clamp(z.uvw[0]),
-        boxMin.y + boxSize.y * vBody,
-        boxMin.z + boxSize.z * clamp(z.uvw[2]),
+      const floor = new three.Mesh(
+        new three.CircleGeometry(3.2, 48),
+        new three.MeshBasicMaterial({ color: 0x0a0a0c, transparent: true, opacity: 0.9 }),
       );
-      markerRoot.add(mark);
-    }
+      floor.rotation.x = -Math.PI / 2;
+      floor.position.y = -0.78;
+      scn.add(floor);
 
-    // Re-center whole assembly in viewport (fixes mobile off-center silhouette)
-    rootGroup.updateMatrixWorld(true);
-    const worldBox = new three.Box3().setFromObject(rootGroup);
-    const worldCenter = worldBox.getCenter(new three.Vector3());
-    rootGroup.position.sub(worldCenter);
-    rootGroup.updateMatrixWorld(true);
+      const gltf = await new GLTFLoader().loadAsync(modelUrl);
+      if (disposed) return;
 
-    calloutsSvg.innerHTML = "";
-    hotspotsUl.innerHTML = "";
-    labelsUl.innerHTML = "";
-    for (const z of zones) {
-      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      path.classList.add("signature__line");
-      path.setAttribute("data-sig-line", z.id);
-      path.setAttribute("fill", "none");
-      path.setAttribute("vector-effect", "non-scaling-stroke");
-      calloutsSvg.appendChild(path);
+      const rootGroup = new three.Group();
+      const model = gltf.scene;
+      fitCar(model, three);
+      model.updateMatrixWorld(true);
+      const edges = stylizeAsTechnical(model, three);
+      model.add(edges);
+      rootGroup.add(model);
+      scn.add(rootGroup);
+      carRoot = rootGroup;
+      edgeGroup = edges;
 
-      const li = document.createElement("li");
-      li.className = "signature__hot";
-      li.setAttribute("data-sig-hot-wrap", z.id);
-      li.innerHTML = `<button type="button" class="signature__dot" data-sig-hot="${z.id}" data-price-id="${z.priceId}" aria-label="${z.title}, ${z.price}. ${z.subtitle}" aria-controls="prices" aria-pressed="false"><span class="signature__dot-core" aria-hidden="true"></span><span class="signature__dot-ring" aria-hidden="true"></span></button>`;
-      hotspotsUl.appendChild(li);
+      const savedYaw = model.rotation.y;
+      model.rotation.y = 0;
+      model.updateMatrixWorld(true);
+      const aligned = new three.Box3().setFromObject(model);
+      const invModel = model.matrixWorld.clone().invert();
+      const localMin = aligned.min.clone().applyMatrix4(invModel);
+      const localMax = aligned.max.clone().applyMatrix4(invModel);
+      boxMin = new three.Vector3(
+        Math.min(localMin.x, localMax.x),
+        Math.min(localMin.y, localMax.y),
+        Math.min(localMin.z, localMax.z),
+      );
+      boxSize = new three.Vector3(
+        Math.abs(localMax.x - localMin.x),
+        Math.abs(localMax.y - localMin.y),
+        Math.abs(localMax.z - localMin.z),
+      );
+      model.rotation.y = savedYaw;
+      model.updateMatrixWorld(true);
 
-      const lab = document.createElement("li");
-      lab.className = `signature__label signature__label--${z.side}`;
-      lab.setAttribute("data-sig-label", z.id);
-      lab.innerHTML = `<span class="signature__label-title">${z.title}</span><span class="signature__label-sub">${z.subtitle}</span><span class="signature__label-price">${z.price}</span>`;
-      labelsUl.appendChild(lab);
-    }
-
-    root.querySelectorAll<HTMLButtonElement>("[data-sig-hot]").forEach((btn) => {
-      const id = () => btn.getAttribute("data-sig-hot");
-      btn.addEventListener("mouseenter", () => {
-        const z = id();
-        if (z) activate(z);
-      });
-      btn.addEventListener("focus", () => {
-        const z = id();
-        if (z) activate(z);
-      });
-      btn.addEventListener("click", () => {
-        const z = id();
-        if (z) activate(z);
-      });
-    });
-
-    alive = true;
-    resize();
-    markReady();
-    root.querySelectorAll<SVGPathElement>("[data-sig-line]").forEach((line, i) => {
-      try {
-        const len = Math.max(line.getTotalLength(), 1);
-        line.style.setProperty("--sig-len", String(len));
-        line.style.strokeDasharray = String(len);
-        line.style.strokeDashoffset = String(len);
-        line.style.animationDelay = `${0.04 + i * 0.04}s`;
-        line.classList.add("is-drawing");
-      } catch {
-        /* skip */
+      markerRoot = new three.Group();
+      model.add(markerRoot);
+      for (const z of zones) {
+        const mark = new three.Object3D();
+        mark.name = `sig-mark-${z.id}`;
+        const vBody = clamp(z.uvw[1] * 0.92);
+        mark.position.set(
+          boxMin.x + boxSize.x * clamp(z.uvw[0]),
+          boxMin.y + boxSize.y * vBody,
+          boxMin.z + boxSize.z * clamp(z.uvw[2]),
+        );
+        markerRoot.add(mark);
       }
-    });
-    paint();
+
+      rootGroup.updateMatrixWorld(true);
+      const worldBox = new three.Box3().setFromObject(rootGroup);
+      rootGroup.position.sub(worldBox.getCenter(new three.Vector3()));
+      rootGroup.updateMatrixWorld(true);
+
+      calloutsSvg.innerHTML = "";
+      hotspotsUl.innerHTML = "";
+      labelsUl.innerHTML = "";
+      for (const z of zones) {
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.classList.add("signature__line");
+        path.setAttribute("data-sig-line", z.id);
+        path.setAttribute("fill", "none");
+        path.setAttribute("vector-effect", "non-scaling-stroke");
+        calloutsSvg.appendChild(path);
+
+        const li = document.createElement("li");
+        li.className = "signature__hot";
+        li.setAttribute("data-sig-hot-wrap", z.id);
+        li.innerHTML = `<button type="button" class="signature__dot" data-sig-hot="${z.id}" data-price-id="${z.priceId}" aria-label="${z.title}, ${z.price}. ${z.subtitle}" aria-controls="prices" aria-pressed="false"><span class="signature__dot-core" aria-hidden="true"></span><span class="signature__dot-ring" aria-hidden="true"></span></button>`;
+        hotspotsUl.appendChild(li);
+
+        const lab = document.createElement("li");
+        lab.className = `signature__label signature__label--${z.side}`;
+        lab.setAttribute("data-sig-label", z.id);
+        lab.innerHTML = `<span class="signature__label-title">${z.title}</span><span class="signature__label-sub">${z.subtitle}</span><span class="signature__label-price">${z.price}</span>`;
+        labelsUl.appendChild(lab);
+      }
+
+      root.querySelectorAll<HTMLButtonElement>("[data-sig-hot]").forEach((btn) => {
+        const id = () => btn.getAttribute("data-sig-hot");
+        btn.addEventListener("mouseenter", () => {
+          const z = id();
+          if (z) activate(z);
+        });
+        btn.addEventListener("focus", () => {
+          const z = id();
+          if (z) activate(z);
+        });
+        btn.addEventListener("click", () => {
+          const z = id();
+          if (z) activate(z);
+        });
+      });
+
+      mounted = true;
+      resize();
+      drawStarted = true;
+      if (reduceMotion) finishDraw();
+      if (inView) startLoop();
+    } finally {
+      mounting = false;
+    }
   };
 
   priceRows.forEach((row) => {
@@ -517,17 +565,25 @@ export function initSignature3D(root: HTMLElement, zones: SigZone3D[], modelUrl:
   const io = new IntersectionObserver(
     (entries) => {
       const on = entries.some((e) => e.isIntersecting);
+      inView = on;
       if (on) {
-        void mount().catch((err) => {
-          console.error("[signature-3d]", err);
-          root.classList.add("is-3d-fallback");
-          markReady();
-        });
-      } else if (alive) {
-        disposeScene();
+        if (!mounted && !mounting) {
+          void mount().catch((err) => {
+            console.error("[signature-3d]", err);
+            root.classList.add("is-3d-fallback");
+            markReady();
+          });
+        } else if (mounted) {
+          // Resume paint only — GLB / canvas stay warm
+          startLoop();
+          paint();
+        }
+      } else {
+        // Pause render loop; keep scene + canvas in DOM
+        stopLoop();
       }
     },
-    { rootMargin: "120px 0px", threshold: 0.05 },
+    { rootMargin: "80px 0px", threshold: 0.02 },
   );
   io.observe(stage);
 

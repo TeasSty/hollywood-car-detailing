@@ -763,6 +763,15 @@ a:hover {
     min-height: clamp(320px, 88vw, 540px);
   }
 
+  /* Mobile: only the active callout label to avoid pile-ups */
+  .signature.is-ready .signature__label {
+    opacity: 0;
+  }
+
+  .signature.is-ready .signature__label.is-active {
+    opacity: 1;
+  }
+
   .signature__label-sub {
     display: none;
   }

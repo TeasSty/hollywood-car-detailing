@@ -12,7 +12,7 @@
 | **Commercial use** | **Yes** — suitable for a commercial detailing website |
 | **On-page credit** | `#signature` → `.signature__credit` |
 
-Rendered as **dark studio + EdgesGeometry wireframe** (technical sketch), not a plastic toy shader.
+Rendered as **dark studio + EdgesGeometry wireframe** (technical sketch). Scene persists after first load (scroll-away only pauses the render loop). First viewport entry plays a one-shot material reveal.
 
 ## Rejected: user-requested Audi e-tron GT
 
